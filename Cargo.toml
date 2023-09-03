@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 ndarray = "0.15.6"
+petgraph = "0.6.4"
 seq_io = "0.3.2"
 trees = "0.4.2"

@@ -1,5 +1,5 @@
 use ndarray::Array2;
-use seq_io::fasta::{OwnedRecord, Reader, Record};
+use seq_io::fasta::{Reader, Record};
 use std::io::Stdin;
 
 use crate::{ResultBox, M};

@@ -8,7 +8,7 @@ use std::{error, io, process};
 use crate::{
     distances::{distance_matrix_from_stdin, DistanceMatrix},
     neighbors::neighbor_joining,
-    newick::newick_format,
+    newick::PhylogeneticTree,
 };
 
 type ResultBox<T> = std::result::Result<T, Box<dyn error::Error>>;
@@ -35,6 +35,10 @@ pub fn run(config: Config) {
         eprintln!("{err}");
         process::exit(1);
     });
-    dbg!(&tree.to_string());
-    newick_format(tree, distance_mat.names)
+    dbg!(&tree);
+    let newick = tree.into_newick().unwrap_or_else(|| {
+        eprintln!("Empty tree");
+        process::exit(1);
+    });
+    println!("{}", newick);
 }
