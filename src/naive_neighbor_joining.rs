@@ -5,13 +5,13 @@ use petgraph::stable_graph::NodeIndex;
 use crate::{phylip_distance_matrix::DistanceMatrix, phylogenetic_tree::PhyloTree, ResultBox};
 
 #[derive(Debug)]
-struct NJ_Matrix {
+struct NjMatrix {
     matrix: Vec<Vec<f64>>,
     names: Vec<String>,
     sum_cols: Vec<f64>,
 }
 
-impl NJ_Matrix {
+impl NjMatrix {
     fn new(d: DistanceMatrix) -> Self {
         let matrix = d.matrix;
         let names = d.names;
@@ -30,7 +30,7 @@ impl NJ_Matrix {
 pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<PhyloTree> {
     let mut t = PhyloTree::new(&dist.names);
     dbg!(&t.nodes);
-    let mut dist = NJ_Matrix::new(dist);
+    let mut dist = NjMatrix::new(dist);
     // Naive NJ
     while dist.matrix.len() > 2 {
         // Find the minimum element in the distance matrix
@@ -41,7 +41,7 @@ pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<PhyloTree> {
     Ok(t)
 }
 
-fn update_distance_matrix(i: usize, j: usize, d: &mut NJ_Matrix) {
+fn update_distance_matrix(i: usize, j: usize, d: &mut NjMatrix) {
     let matrix = &mut d.matrix;
     // Remove the ith and jth value to each row
     for k in 0..matrix.len() {
@@ -94,7 +94,7 @@ fn update_distance_matrix(i: usize, j: usize, d: &mut NJ_Matrix) {
     debug_assert_eq!(d.sum_cols.len(), d.matrix.len())
 }
 
-fn find_neighbors(d: &mut NJ_Matrix) -> (usize, usize) {
+fn find_neighbors(d: &mut NjMatrix) -> (usize, usize) {
     let mut neighbors = (0, 0);
     let mut best_q = f64::INFINITY;
     let matrix = &d.matrix;
@@ -128,7 +128,7 @@ mod tests {
             vec![9.0, 10.0, 8.0, 0.0, 3.0],
             vec![8.0, 9.0, 7.0, 3.0, 0.0],
         ];
-        let mut mat = NJ_Matrix::new(DistanceMatrix {
+        let mut mat = NjMatrix::new(DistanceMatrix {
             matrix: mat,
             names: vec![
                 "A".to_string(),
@@ -140,5 +140,14 @@ mod tests {
         });
         let index = find_neighbors(&mut mat);
         assert_eq!(index, (0, 1));
+    }
+    // NJ should find a true binary tree if it exist
+    #[test]
+    fn test_naive_neighbor_joining() {
+        let original_tree = PhyloTree::random(5);
+        let d = DistanceMatrix::from(original_tree.clone());
+        let original_tree = original_tree.tree;
+        let tree = naive_neighbor_joining(d).unwrap();
+        assert!(petgraph::algo::is_isomorphic(&original_tree, &tree.tree));
     }
 }

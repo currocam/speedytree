@@ -5,10 +5,11 @@ use std::collections::HashMap;
 use petgraph::{graph::UnGraph, stable_graph::NodeIndex, visit::IntoNodeReferences};
 use rand::Rng;
 
+#[derive(Debug, Clone)]
 pub struct PhyloTree {
     pub tree: UnGraph<String, f64>,
-    root: NodeIndex,
-    n_leaves: usize,
+    pub root: NodeIndex,
+    pub n_leaves: usize,
     pub nodes: HashMap<usize, NodeIndex>,
 }
 
