@@ -1,9 +1,7 @@
 pub mod naive_neighbor_joining;
 pub mod phylip_distance_matrix;
 pub mod phylogenetic_tree;
-use petgraph::{
-    dot::{self, Dot},
-};
+use petgraph::dot::{self, Dot};
 
 use std::{error, io, process};
 
@@ -20,13 +18,13 @@ impl Config {
 
 pub fn run(config: Config) {
     dbg!(&config);
-    let mut distance_mat = phylip_distance_matrix::read_phylip_distance_matrix(io::stdin().lock())
+    let distance_mat = phylip_distance_matrix::read_phylip_distance_matrix(io::stdin().lock())
         .unwrap_or_else(|err| {
             eprintln!("{err}");
             process::exit(1);
         });
     //dbg!(&distance_mat);
-    let tree = naive_neighbor_joining::naive_neighbor_joining(&mut distance_mat);
+    let tree = naive_neighbor_joining::naive_neighbor_joining(distance_mat);
     let graph = &tree.unwrap().tree;
     println!(
         "{:?}",

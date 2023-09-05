@@ -4,58 +4,102 @@ use petgraph::stable_graph::NodeIndex;
 
 use crate::{phylip_distance_matrix::DistanceMatrix, phylogenetic_tree::PhyloTree, ResultBox};
 
-pub fn naive_neighbor_joining(dist: &mut DistanceMatrix) -> ResultBox<PhyloTree> {
+#[derive(Debug)]
+struct NJ_Matrix {
+    matrix: Vec<Vec<f64>>,
+    names: Vec<String>,
+    sum_cols: Vec<f64>,
+}
+
+impl NJ_Matrix {
+    fn new(d: DistanceMatrix) -> Self {
+        let matrix = d.matrix;
+        let names = d.names;
+        let sum_cols = matrix
+            .iter()
+            .map(|row| row.iter().sum::<f64>())
+            .collect::<Vec<f64>>();
+        Self {
+            matrix,
+            names,
+            sum_cols,
+        }
+    }
+}
+
+pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<PhyloTree> {
     let mut t = PhyloTree::new(&dist.names);
     dbg!(&t.nodes);
+    let mut dist = NJ_Matrix::new(dist);
     // Naive NJ
     while dist.matrix.len() > 2 {
         // Find the minimum element in the distance matrix
-        let (i, j) = find_neighbors(&dist.matrix);
+        let (i, j) = find_neighbors(&mut dist);
         let _u: NodeIndex = t.merge_neighbors(i, j);
-        update_distance_matrix(i, j, &mut dist.matrix);
+        update_distance_matrix(i, j, &mut dist);
     }
     Ok(t)
 }
 
-fn update_distance_matrix(i: usize, j: usize, matrix: &mut Vec<Vec<f64>>) {
-    // Swap i and j so that i < j
-    let (i, j) = if i < j { (i, j) } else { (j, i) };
+fn update_distance_matrix(i: usize, j: usize, d: &mut NJ_Matrix) {
+    let matrix = &mut d.matrix;
+    // Remove the ith and jth value to each row
+    for k in 0..matrix.len() {
+        d.sum_cols[k] -= matrix[i][k] + matrix[j][k];
+    }
+
     let dij = matrix[i][j];
     let n = matrix.len();
 
+    // Swap rows
     if j == n - 2 {
         matrix.swap(i, n - 1);
+        d.sum_cols.swap(i, n - 1);
         for row in matrix.iter_mut() {
             row.swap(i, n - 1);
         }
     } else {
         matrix.swap(i, n - 2);
         matrix.swap(j, n - 1);
+        d.sum_cols.swap(i, n - 2);
+        d.sum_cols.swap(j, n - 1);
         for row in matrix.iter_mut() {
             row.swap(i, n - 2);
             row.swap(j, n - 1);
         }
     }
-    // Update the row.len() - 2 row
+
+    // Update the row.len() - 2 row (aka u row)
     for k in 0..matrix.len() - 2 {
         matrix[n - 2][k] = (matrix[i][k] + matrix[j][k] - matrix[i][j]) / 2.0;
+        matrix[k][n - 2] = matrix[n - 2][k];
     }
     matrix[n - 2][n - 2] = dij;
+
     // Remove the last row and every last column
     matrix.pop();
+    d.sum_cols.pop();
     for row in matrix.iter_mut() {
         row.pop();
     }
+
+    // Update the sum_cols with RS_i = RS'_i - x - y + z
+    for index in 0..n - 2 {
+        d.sum_cols[index] += matrix[n - 2][index];
+    }
+
+    // Compute the sum of the last row
+    d.sum_cols[n - 2] = matrix[n - 2].iter().sum::<f64>();
+
+    debug_assert_eq!(d.sum_cols.len(), d.matrix.len())
 }
 
-fn find_neighbors(matrix: &Vec<Vec<f64>>) -> (usize, usize) {
+fn find_neighbors(d: &mut NJ_Matrix) -> (usize, usize) {
     let mut neighbors = (0, 0);
     let mut best_q = f64::INFINITY;
+    let matrix = &d.matrix;
     let n = matrix.len();
-    let sums = matrix
-        .iter()
-        .map(|row| row.iter().sum::<f64>())
-        .collect::<Vec<f64>>();
+    let sums = &d.sum_cols;
 
     for i in 0..n {
         for j in i + 1..n {
@@ -73,20 +117,28 @@ fn find_neighbors(matrix: &Vec<Vec<f64>>) -> (usize, usize) {
 mod tests {
     use std::vec;
 
-    use ndarray::array;
-
     use super::*;
 
     #[test]
     fn test_find_neighbors() {
-        let mut mat = vec![
+        let mat = vec![
             vec![0.0, 5.0, 9.0, 9.0, 8.0],
             vec![5.0, 0.0, 10.0, 10.0, 9.0],
             vec![9.0, 10.0, 0.0, 8.0, 7.0],
             vec![9.0, 10.0, 8.0, 0.0, 3.0],
             vec![8.0, 9.0, 7.0, 3.0, 0.0],
         ];
-        let index = find_neighbors(&mat);
+        let mut mat = NJ_Matrix::new(DistanceMatrix {
+            matrix: mat,
+            names: vec![
+                "A".to_string(),
+                "B".to_string(),
+                "C".to_string(),
+                "D".to_string(),
+                "E".to_string(),
+            ],
+        });
+        let index = find_neighbors(&mut mat);
         assert_eq!(index, (0, 1));
     }
 }
