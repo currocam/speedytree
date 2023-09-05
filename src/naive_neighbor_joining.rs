@@ -1,47 +1,40 @@
+use std::cmp::{max, min};
+
 use petgraph::stable_graph::NodeIndex;
 
 use crate::{phylip_distance_matrix::DistanceMatrix, phylogenetic_tree::PhyloTree, ResultBox};
 
 pub fn naive_neighbor_joining(dist: &mut DistanceMatrix) -> ResultBox<PhyloTree> {
     let mut t = PhyloTree::new(&dist.names);
+    dbg!(&t.nodes);
     // Naive NJ
     while dist.matrix.len() > 2 {
         // Find the minimum element in the distance matrix
         let (i, j) = find_neighbors(&dist.matrix);
-        // Merge the nodes
-        let u = t.merge_nodes(t.nodes[i], t.nodes[j]);
-        // Update the distance matrix
-        update_distance_matrix(i, j, u, &mut t, &mut dist.matrix);
-        dbg!(t.tree.node_count());
+        let _u: NodeIndex = t.merge_neighbors(i, j);
+        update_distance_matrix(i, j, &mut dist.matrix);
     }
     Ok(t)
 }
 
-fn update_distance_matrix(
-    i: usize,
-    j: usize,
-    u: NodeIndex,
-    t: &mut PhyloTree,
-    matrix: &mut Vec<Vec<f64>>,
-) {
+fn update_distance_matrix(i: usize, j: usize, matrix: &mut Vec<Vec<f64>>) {
     // Swap i and j so that i < j
     let (i, j) = if i < j { (i, j) } else { (j, i) };
     let dij = matrix[i][j];
     let n = matrix.len();
-    // Swap i and j so those are the last two rows
-    matrix.swap(i, n - 2);
-    matrix.swap(j, n - 1);
-    // Update nodes in tree
-    t.nodes.swap(i, n - 2);
-    t.nodes.swap(j, n - 1);
-    t.nodes.pop();
-    t.nodes.pop();
-    t.nodes.push(u);
 
-    // Swap i and j so those are the last two columns
-    for row in matrix.iter_mut() {
-        row.swap(i, n - 2);
-        row.swap(j, n - 1);
+    if j == n - 2 {
+        matrix.swap(i, n - 1);
+        for row in matrix.iter_mut() {
+            row.swap(i, n - 1);
+        }
+    } else {
+        matrix.swap(i, n - 2);
+        matrix.swap(j, n - 1);
+        for row in matrix.iter_mut() {
+            row.swap(i, n - 2);
+            row.swap(j, n - 1);
+        }
     }
     // Update the row.len() - 2 row
     for k in 0..matrix.len() - 2 {
@@ -73,7 +66,7 @@ fn find_neighbors(matrix: &Vec<Vec<f64>>) -> (usize, usize) {
             }
         }
     }
-    neighbors
+    (min(neighbors.0, neighbors.1), max(neighbors.0, neighbors.1))
 }
 
 #[cfg(test)]

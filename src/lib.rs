@@ -3,7 +3,6 @@ pub mod phylip_distance_matrix;
 pub mod phylogenetic_tree;
 use petgraph::{
     dot::{self, Dot},
-    graph,
 };
 
 use std::{error, io, process};
@@ -26,7 +25,7 @@ pub fn run(config: Config) {
             eprintln!("{err}");
             process::exit(1);
         });
-    dbg!(&distance_mat);
+    //dbg!(&distance_mat);
     let tree = naive_neighbor_joining::naive_neighbor_joining(&mut distance_mat);
     let graph = &tree.unwrap().tree;
     println!(
