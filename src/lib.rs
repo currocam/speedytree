@@ -5,6 +5,8 @@ use petgraph::dot::{self, Dot};
 
 use std::{error, io, process};
 
+use crate::phylogenetic_tree::PhyloTree;
+
 type ResultBox<T> = std::result::Result<T, Box<dyn error::Error>>;
 
 #[derive(Debug)]

@@ -2,10 +2,8 @@ use std::collections::HashMap;
 
 // Binary tree with edge lengths using petgraph
 // graph from petagraph
-use petgraph::{
-    graph::{UnGraph},
-    stable_graph::NodeIndex,
-};
+use petgraph::{graph::UnGraph, stable_graph::NodeIndex, visit::IntoNodeReferences};
+use rand::Rng;
 
 pub struct PhyloTree {
     pub tree: UnGraph<String, f64>,
@@ -16,7 +14,8 @@ pub struct PhyloTree {
 
 impl PhyloTree {
     pub fn new(leafs: &Vec<String>) -> PhyloTree {
-        let mut tree = UnGraph::new_undirected();
+        let mut tree: petgraph::Graph<String, f64, petgraph::Undirected> =
+            UnGraph::new_undirected();
         let root = tree.add_node("root".to_string());
         let mut nodes = HashMap::new();
         for (i, leaf) in leafs.iter().enumerate() {
@@ -76,6 +75,29 @@ impl PhyloTree {
         self.tree.remove_edge(a_edge.0);
         self.tree.remove_edge(b_edge.0);
         new_node
+    }
+    pub fn random(n: usize) -> PhyloTree {
+        let leafs = (1..n).map(|x| x.to_string()).collect::<Vec<String>>();
+        let mut tree = PhyloTree::new(&leafs);
+        // Find a first node with more than 2 neighbors
+        let mut node = tree.tree.neighbors(tree.root).next().unwrap();
+        while tree.tree.neighbors(node).count() <= 2 {
+            node = tree.tree.neighbors(node).next().unwrap();
+        }
+        // Merge nodes until only 2 neighbors are left
+        while tree.tree.neighbors(node).count() > 2 {
+            let a = tree.tree.neighbors(node).next().unwrap();
+            let b = tree.tree.neighbors(node).nth(1).unwrap();
+            tree.merge_nodes(a, b);
+        }
+
+        // Iterate through all edges and assign random weights
+        let mut rng = rand::thread_rng();
+        for edge in tree.tree.edge_indices() {
+            let weight = rng.gen_range(0.1..10.0);
+            tree.tree[edge] = weight;
+        }
+        tree
     }
 }
 
