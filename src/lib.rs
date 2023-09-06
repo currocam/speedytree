@@ -35,21 +35,4 @@ pub fn run(config: Config) {
         "{:?}",
         Dot::with_config(&graph, &[dot::Config::EdgeNoLabel])
     );
-    // let original_tree = PhyloTree::random(6);
-    // println!(
-    //     "{:?}",
-    //     Dot::with_config(&original_tree.tree, &[dot::Config::EdgeNoLabel])
-    // );
-    // let d = phylip_distance_matrix::DistanceMatrix::from(original_tree.clone());
-    // println!("{:?}", d);
-
-    // let tree = naive_neighbor_joining::naive_neighbor_joining(d).unwrap();
-    // println!(
-    //     "{:?}",
-    //     Dot::with_config(&tree.tree, &[dot::Config::EdgeNoLabel])
-    // );
-    // dbg!(petgraph::algo::is_isomorphic(
-    //     &original_tree.tree,
-    //     &tree.tree
-    // ));
 }

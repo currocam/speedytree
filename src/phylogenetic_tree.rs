@@ -69,9 +69,14 @@ impl PhyloTree {
             .collect::<Vec<String>>();
         let mut tree = PhyloTree::new(&leafs);
         let n_nodes_end = 2 * tree.n_unmerged_leaves - 2;
-        while tree.tree.node_count() <= n_nodes_end {
-            let _u = tree.merge_neighbors(0, 1);
+        let mut previous_internal_node = None;
+        let mut internal_node = None;
+        for _ in 0..n_nodes_end - n {
+            previous_internal_node = internal_node;
+            internal_node = Some(tree.merge_neighbors(0, 1));
         }
+        tree.tree
+            .add_edge(previous_internal_node.unwrap(), internal_node.unwrap(), 0.0);
         // Iterate through all edges and assign random weights
         let mut rng = rand::thread_rng();
         for edge in tree.tree.edge_indices() {

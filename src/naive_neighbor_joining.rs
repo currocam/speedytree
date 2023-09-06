@@ -153,8 +153,8 @@ mod tests {
     // NJ should find a true binary tree if it exist
     #[test]
     fn test_naive_neighbor_joining() {
-        for i in 4..6 {
-            let original_tree = PhyloTree::random(i);
+        for i in 4..40 {
+            let original_tree: PhyloTree = PhyloTree::random(i);
             let d = DistanceMatrix::from(original_tree.clone());
             let original_tree = original_tree.tree;
             let tree = naive_neighbor_joining(d).unwrap();
