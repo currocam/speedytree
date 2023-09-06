@@ -79,20 +79,12 @@ impl PhyloTree {
         new_node
     }
     pub fn random(n: usize) -> PhyloTree {
-        let leafs = (1..n).map(|x| x.to_string()).collect::<Vec<String>>();
+        let leafs = (1..n).map(|x| x.to_string()).rev().collect::<Vec<String>>();
         let mut tree = PhyloTree::new(&leafs);
-        // Find a first node with more than 2 neighbors
-        let mut node = tree.tree.neighbors(tree.root).next().unwrap();
-        while tree.tree.neighbors(node).count() <= 2 {
-            node = tree.tree.neighbors(node).next().unwrap();
+        let n_nodes_end = 2 * tree.n_leaves - 2;
+        while tree.tree.node_count() <= n_nodes_end {
+            let _u = tree.merge_neighbors(0, 1);
         }
-        // Merge nodes until only 2 neighbors are left
-        while tree.tree.neighbors(node).count() > 2 {
-            let a = tree.tree.neighbors(node).next().unwrap();
-            let b = tree.tree.neighbors(node).nth(1).unwrap();
-            tree.merge_nodes(a, b);
-        }
-
         // Iterate through all edges and assign random weights
         let mut rng = rand::thread_rng();
         for edge in tree.tree.edge_indices() {
