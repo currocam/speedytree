@@ -1,14 +1,9 @@
 pub mod naive_neighbor_joining;
 pub mod phylip_distance_matrix;
 pub mod phylogenetic_tree;
-use petgraph::{
-    algo,
-    dot::{self, Dot},
-};
+use petgraph::dot::{self, Dot};
 
 use std::{error, io, process};
-
-use crate::phylogenetic_tree::PhyloTree;
 
 type ResultBox<T> = std::result::Result<T, Box<dyn error::Error>>;
 

@@ -1,29 +1,21 @@
 use std::cmp::{max, min};
 
-use petgraph::{stable_graph::NodeIndex, visit::NodeIndexable};
-
 use crate::{phylip_distance_matrix::DistanceMatrix, phylogenetic_tree::PhyloTree, ResultBox};
 
 #[derive(Debug)]
 struct NjMatrix {
     matrix: Vec<Vec<f64>>,
-    names: Vec<String>,
     sum_cols: Vec<f64>,
 }
 
 impl NjMatrix {
     fn new(d: DistanceMatrix) -> Self {
         let matrix = d.matrix;
-        let names = d.names;
         let sum_cols = matrix
             .iter()
             .map(|row| row.iter().sum::<f64>())
             .collect::<Vec<f64>>();
-        Self {
-            matrix,
-            names,
-            sum_cols,
-        }
+        Self { matrix, sum_cols }
     }
 }
 
@@ -42,7 +34,7 @@ pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<PhyloTree> {
     Ok(t)
 }
 
-fn terminate_nj(mut t: PhyloTree, d: &mut NjMatrix) -> PhyloTree {
+fn terminate_nj(mut t: PhyloTree, _d: &mut NjMatrix) -> PhyloTree {
     let (i, j, m) = (t.nodes[&0], t.nodes[&1], t.nodes[&2]);
     let v = t.tree.add_node("".to_owned());
     t.tree.add_edge(v, i, 0.0);

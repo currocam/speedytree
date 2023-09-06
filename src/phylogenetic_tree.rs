@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 // Binary tree with edge lengths using petgraph
 // graph from petagraph
-use petgraph::{graph::UnGraph, stable_graph::NodeIndex, visit::IntoNodeReferences};
+use petgraph::{graph::UnGraph, stable_graph::NodeIndex};
 use rand::Rng;
 
 #[derive(Debug, Clone)]
