@@ -1,7 +1,10 @@
 pub mod naive_neighbor_joining;
 pub mod phylip_distance_matrix;
 pub mod phylogenetic_tree;
-use petgraph::dot::{self, Dot};
+use petgraph::{
+    algo,
+    dot::{self, Dot},
+};
 
 use std::{error, io, process};
 
@@ -32,18 +35,21 @@ pub fn run(config: Config) {
         "{:?}",
         Dot::with_config(&graph, &[dot::Config::EdgeNoLabel])
     );
-
-    // let leafs = (1..8).map(|x| x.to_string()).rev().collect::<Vec<String>>();
-    // let mut tree = PhyloTree::new(&leafs);
-
-    // for (i, j) in (0..8).step_by(2) {
-    //     let (i, j) = (0, 1);
-    //     let _u = tree.merge_neighbors(i, j);
-    // }
-
-    // let graph = &tree.tree;
+    // let original_tree = PhyloTree::random(6);
     // println!(
     //     "{:?}",
-    //     Dot::with_config(&graph, &[dot::Config::EdgeNoLabel])
+    //     Dot::with_config(&original_tree.tree, &[dot::Config::EdgeNoLabel])
     // );
+    // let d = phylip_distance_matrix::DistanceMatrix::from(original_tree.clone());
+    // println!("{:?}", d);
+
+    // let tree = naive_neighbor_joining::naive_neighbor_joining(d).unwrap();
+    // println!(
+    //     "{:?}",
+    //     Dot::with_config(&tree.tree, &[dot::Config::EdgeNoLabel])
+    // );
+    // dbg!(petgraph::algo::is_isomorphic(
+    //     &original_tree.tree,
+    //     &tree.tree
+    // ));
 }

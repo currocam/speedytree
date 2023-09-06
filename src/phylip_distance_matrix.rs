@@ -12,16 +12,19 @@ pub struct DistanceMatrix {
 
 impl From<PhyloTree> for DistanceMatrix {
     fn from(value: PhyloTree) -> Self {
-        let mut matrix = vec![vec![0.0; value.n_leaves]; value.n_leaves];
-        let mut names = Vec::with_capacity(value.n_leaves);
-        for i_leaf in 0..value.n_leaves {
-            let node = value.nodes.get(&i_leaf).unwrap();
+        // Ge keys from hash
+        let n_leaves = value.leaves.len();
+        let mut matrix = vec![vec![0.0; n_leaves]; n_leaves];
+        let mut names = Vec::with_capacity(n_leaves);
+        dbg!(&value.leaves);
+        for i_leaf in 0..n_leaves {
+            let node = value.leaves.get(&i_leaf).unwrap();
             names.push(value.tree[*node].to_owned());
         }
-        for i in 0..value.n_leaves {
-            for j in i..value.n_leaves {
-                let node_i = value.nodes.get(&i).unwrap();
-                let node_j = value.nodes.get(&j).unwrap();
+        for i in 0..n_leaves {
+            for j in i..n_leaves {
+                let node_i = value.leaves.get(&i).unwrap();
+                let node_j = value.leaves.get(&j).unwrap();
                 let path = algo::astar(
                     &value.tree,
                     *node_i,          // start

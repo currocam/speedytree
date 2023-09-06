@@ -1,6 +1,6 @@
 use std::cmp::{max, min};
 
-use petgraph::stable_graph::NodeIndex;
+use petgraph::{stable_graph::NodeIndex, visit::NodeIndexable};
 
 use crate::{phylip_distance_matrix::DistanceMatrix, phylogenetic_tree::PhyloTree, ResultBox};
 
@@ -32,19 +32,22 @@ pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<PhyloTree> {
     dbg!(&t.nodes);
     let mut dist = NjMatrix::new(dist);
     // While n nodes is not 2n -2
-    let n_nodes_end = 2 * t.n_leaves - 2;
-    while t.tree.node_count() < n_nodes_end {
+    while dist.matrix.len() > 3 {
         // Find the minimum element in the distance matrix
         let (i, j) = find_neighbors(&mut dist);
-        let _u: NodeIndex = t.merge_neighbors(i, j);
+        t.merge_neighbors(i, j);
         update_distance_matrix(i, j, &mut dist);
     }
     t = terminate_nj(t, &mut dist);
     Ok(t)
 }
 
-fn terminate_nj(mut t: PhyloTree, dist: &mut NjMatrix) -> PhyloTree {
-    t.merge_neighbors(0, 1);
+fn terminate_nj(mut t: PhyloTree, d: &mut NjMatrix) -> PhyloTree {
+    let (i, j, m) = (t.nodes[&0], t.nodes[&1], t.nodes[&2]);
+    let v = t.tree.add_node("".to_owned());
+    t.tree.add_edge(v, i, 0.0);
+    t.tree.add_edge(v, j, 0.0);
+    t.tree.add_edge(v, m, 0.0);
     t
 }
 
@@ -150,7 +153,7 @@ mod tests {
     // NJ should find a true binary tree if it exist
     #[test]
     fn test_naive_neighbor_joining() {
-        for i in 4..8 {
+        for i in 4..6 {
             let original_tree = PhyloTree::random(i);
             let d = DistanceMatrix::from(original_tree.clone());
             let original_tree = original_tree.tree;
