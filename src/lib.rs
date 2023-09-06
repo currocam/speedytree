@@ -33,16 +33,15 @@ pub fn run(config: Config) {
         Dot::with_config(&graph, &[dot::Config::EdgeNoLabel])
     );
 
-    // let tree = PhyloTree::random(5 + 1);
+    // let leafs = (1..8).map(|x| x.to_string()).rev().collect::<Vec<String>>();
+    // let mut tree = PhyloTree::new(&leafs);
+
+    // for (i, j) in (0..8).step_by(2) {
+    //     let (i, j) = (0, 1);
+    //     let _u = tree.merge_neighbors(i, j);
+    // }
+
     // let graph = &tree.tree;
-    // println!(
-    //     "{:?}",
-    //     Dot::with_config(&graph, &[dot::Config::EdgeNoLabel])
-    // );
-    // let d = phylip_distance_matrix::DistanceMatrix::from(tree);
-    // dbg!(&d);
-    // let tree = naive_neighbor_joining::naive_neighbor_joining(d);
-    // let graph = &tree.unwrap().tree;
     // println!(
     //     "{:?}",
     //     Dot::with_config(&graph, &[dot::Config::EdgeNoLabel])

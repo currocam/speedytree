@@ -32,6 +32,7 @@ impl PhyloTree {
             n_leaves,
         }
     }
+
     pub fn merge_neighbors(&mut self, a: usize, b: usize) -> NodeIndex {
         // Get nodes to merge
         let n = &self.n_leaves;
