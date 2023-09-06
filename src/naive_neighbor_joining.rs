@@ -36,6 +36,7 @@ pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<PhyloTree> {
         // Find the minimum element in the distance matrix
         let (i, j) = find_neighbors(&mut dist);
         let _u: NodeIndex = t.merge_neighbors(i, j);
+        dbg!(&dist);
         update_distance_matrix(i, j, &mut dist);
     }
     Ok(t)
@@ -71,10 +72,9 @@ fn update_distance_matrix(i: usize, j: usize, d: &mut NjMatrix) {
 
     // Update the row.len() - 2 row (aka u row)
     for k in 0..matrix.len() - 2 {
-        matrix[n - 2][k] = (matrix[i][k] + matrix[j][k] - matrix[i][j]) / 2.0;
+        matrix[n - 2][k] = (matrix[n - 2][k] + matrix[n - 1][k] - dij) / 2.0;
         matrix[k][n - 2] = matrix[n - 2][k];
     }
-    matrix[n - 2][n - 2] = dij;
 
     // Remove the last row and every last column
     matrix.pop();

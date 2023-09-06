@@ -17,7 +17,7 @@ impl PhyloTree {
     pub fn new(leafs: &Vec<String>) -> PhyloTree {
         let mut tree: petgraph::Graph<String, f64, petgraph::Undirected> =
             UnGraph::new_undirected();
-        let root = tree.add_node("root".to_string());
+        let root = tree.add_node("".to_string());
         let mut nodes = HashMap::new();
         for (i, leaf) in leafs.iter().enumerate() {
             let node = tree.add_node(leaf.to_owned());

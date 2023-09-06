@@ -33,18 +33,18 @@ pub fn run(config: Config) {
         Dot::with_config(&graph, &[dot::Config::EdgeNoLabel])
     );
 
-    let tree = PhyloTree::random(10);
-    let graph = &tree.tree;
-    println!(
-        "{:?}",
-        Dot::with_config(&graph, &[dot::Config::EdgeNoLabel])
-    );
-    let d = phylip_distance_matrix::DistanceMatrix::from(tree);
-    dbg!(&d);
-    let tree = naive_neighbor_joining::naive_neighbor_joining(d);
-    let graph = &tree.unwrap().tree;
-    println!(
-        "{:?}",
-        Dot::with_config(&graph, &[dot::Config::EdgeNoLabel])
-    );
+    // let tree = PhyloTree::random(5 + 1);
+    // let graph = &tree.tree;
+    // println!(
+    //     "{:?}",
+    //     Dot::with_config(&graph, &[dot::Config::EdgeNoLabel])
+    // );
+    // let d = phylip_distance_matrix::DistanceMatrix::from(tree);
+    // dbg!(&d);
+    // let tree = naive_neighbor_joining::naive_neighbor_joining(d);
+    // let graph = &tree.unwrap().tree;
+    // println!(
+    //     "{:?}",
+    //     Dot::with_config(&graph, &[dot::Config::EdgeNoLabel])
+    // );
 }
