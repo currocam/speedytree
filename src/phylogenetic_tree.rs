@@ -34,7 +34,7 @@ impl PhyloTree {
         }
     }
 
-    pub fn merge_neighbors(&mut self, a: usize, b: usize) -> NodeIndex {
+    pub fn merge_neighbors(&mut self, a: usize, b: usize, dau: f64, dbu: f64) -> NodeIndex {
         // Get nodes to merge
         let n: &usize = &self.n_unmerged_leaves;
         let a_node = self.nodes.remove(&a).unwrap();
@@ -58,8 +58,8 @@ impl PhyloTree {
         self.n_unmerged_leaves -= 1;
 
         // Add new edges
-        self.tree.add_edge(u, a_node, 0.0);
-        self.tree.add_edge(u, b_node, 0.0);
+        self.tree.add_edge(u, a_node, dau);
+        self.tree.add_edge(u, b_node, dbu);
         u
     }
     pub fn random(n: usize) -> PhyloTree {
@@ -73,7 +73,7 @@ impl PhyloTree {
         let mut internal_node = None;
         for _ in 0..n_nodes_end - n {
             previous_internal_node = internal_node;
-            internal_node = Some(tree.merge_neighbors(0, 1));
+            internal_node = Some(tree.merge_neighbors(0, 1, 0.0, 0.0));
         }
         tree.tree
             .add_edge(previous_internal_node.unwrap(), internal_node.unwrap(), 0.0);

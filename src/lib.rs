@@ -26,6 +26,7 @@ pub fn run(config: Config) {
     //dbg!(&distance_mat);
     let tree = naive_neighbor_joining::naive_neighbor_joining(distance_mat);
     let graph = &tree.unwrap().tree;
+    dbg!(&graph);
     println!(
         "{:?}",
         Dot::with_config(&graph, &[dot::Config::EdgeNoLabel])

@@ -27,19 +27,24 @@ pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<PhyloTree> {
     while dist.matrix.len() > 3 {
         // Find the minimum element in the distance matrix
         let (i, j) = find_neighbors(&mut dist);
-        t.merge_neighbors(i, j);
+        let dist_ui = (dist.matrix[i][j] + dist.sum_cols[i] - dist.sum_cols[j]) / 2.0;
+        let dist_uj = dist.matrix[i][j] - dist_ui;
+        t.merge_neighbors(i, j, dist_ui, dist_uj);
         update_distance_matrix(i, j, &mut dist);
     }
     t = terminate_nj(t, &mut dist);
     Ok(t)
 }
 
-fn terminate_nj(mut t: PhyloTree, _d: &mut NjMatrix) -> PhyloTree {
+fn terminate_nj(mut t: PhyloTree, d: &mut NjMatrix) -> PhyloTree {
     let (i, j, m) = (t.nodes[&0], t.nodes[&1], t.nodes[&2]);
+    let dvi = d.matrix[0][1] + d.matrix[0][2] - d.matrix[1][2];
+    let dvj = d.matrix[0][1] + d.matrix[1][2] - d.matrix[0][2];
+    let dvm = d.matrix[0][2] + d.matrix[1][2] - d.matrix[0][1];
     let v = t.tree.add_node("".to_owned());
-    t.tree.add_edge(v, i, 0.0);
-    t.tree.add_edge(v, j, 0.0);
-    t.tree.add_edge(v, m, 0.0);
+    t.tree.add_edge(v, i, dvi);
+    t.tree.add_edge(v, j, dvj);
+    t.tree.add_edge(v, m, dvm);
     t
 }
 
