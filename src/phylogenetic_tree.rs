@@ -3,7 +3,7 @@ use std::collections::HashMap;
 // Binary tree with edge lengths using petgraph
 // graph from petagraph
 use petgraph::{graph::UnGraph, stable_graph::NodeIndex};
-use rand::Rng;
+use rand::{seq::SliceRandom, Rng};
 
 #[derive(Debug, Clone)]
 pub struct PhyloTree {
@@ -67,6 +67,10 @@ impl PhyloTree {
             .map(|x| x.to_string())
             .rev()
             .collect::<Vec<String>>();
+        // Shuffle leafs
+        let mut rng = rand::thread_rng();
+        let mut leafs = leafs;
+        leafs.shuffle(&mut rng);
         let mut tree = PhyloTree::new(&leafs);
         let n_nodes_end = 2 * tree.n_unmerged_leaves - 2;
         let mut previous_internal_node = None;
