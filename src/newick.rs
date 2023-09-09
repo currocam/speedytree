@@ -32,6 +32,7 @@ pub fn to_newick(t: &G) -> String {
             }
         }
         newick.push(')');
+
         let e = t.find_edge(node, parent);
         if let Some(e) = e {
             newick.push_str(&format!(":{}", t.edge_weight(e).unwrap()));

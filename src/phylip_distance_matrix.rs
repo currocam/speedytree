@@ -16,7 +16,7 @@ impl From<PhyloTree> for DistanceMatrix {
         let n_leaves = value.leaves.len();
         let mut matrix = vec![vec![0.0; n_leaves]; n_leaves];
         let mut names = Vec::with_capacity(n_leaves);
-        dbg!(&value.leaves);
+        //dbg!(&value.leaves);
         for i_leaf in 0..n_leaves {
             let node = value.leaves.get(&i_leaf).unwrap();
             names.push(value.tree[*node].to_owned());

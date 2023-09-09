@@ -21,7 +21,7 @@ impl NjMatrix {
 
 pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<PhyloTree> {
     let mut t = PhyloTree::new(&dist.names);
-    dbg!(&t.nodes);
+    //dbg!(&t.nodes);
     let mut dist = NjMatrix::new(dist);
     // While n nodes is not 2n -2
     while dist.matrix.len() > 3 {
