@@ -3,13 +3,13 @@ use std::cmp::{max, min};
 use crate::{phylip_distance_matrix::DistanceMatrix, phylogenetic_tree::PhyloTree, ResultBox};
 
 #[derive(Debug)]
-struct NjMatrix {
+pub struct NjMatrix {
     matrix: Vec<Vec<f64>>,
     sum_cols: Vec<f64>,
 }
 
 impl NjMatrix {
-    fn new(d: DistanceMatrix) -> Self {
+    pub fn new(d: DistanceMatrix) -> Self {
         let matrix = d.matrix;
         let sum_cols = matrix
             .iter()
@@ -99,7 +99,7 @@ fn update_distance_matrix(i: usize, j: usize, d: &mut NjMatrix) {
     d.sum_cols[n - 2] = matrix[n - 2].iter().sum::<f64>();
 }
 
-fn find_neighbors(d: &mut NjMatrix) -> (usize, usize) {
+pub fn find_neighbors(d: &mut NjMatrix) -> (usize, usize) {
     let mut neighbors = (0, 0);
     let mut best_q = f64::INFINITY;
     let matrix = &d.matrix;
@@ -120,12 +120,8 @@ fn find_neighbors(d: &mut NjMatrix) -> (usize, usize) {
 
 #[cfg(test)]
 mod tests {
-    use std::vec;
-
-    use petgraph::visit::IntoNeighbors;
-
     use super::*;
-
+    use std::vec;
     #[test]
     fn test_find_neighbors() {
         let mat = vec![
@@ -212,7 +208,7 @@ mod tests {
     }
     #[test]
     fn test_random_additive_binary_trees() {
-        for i in 4..40 {
+        for i in 6..50 {
             let original_tree: PhyloTree = PhyloTree::random(i);
             let d = DistanceMatrix::from(original_tree.clone());
             let original_tree = original_tree.tree;

@@ -2,6 +2,7 @@ pub mod naive_neighbor_joining;
 pub mod newick;
 pub mod phylip_distance_matrix;
 pub mod phylogenetic_tree;
+pub mod rapidnj;
 
 use std::{error, io, process};
 
