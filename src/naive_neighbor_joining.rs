@@ -4,8 +4,8 @@ use crate::{phylip_distance_matrix::DistanceMatrix, phylogenetic_tree::PhyloTree
 
 #[derive(Debug)]
 pub struct NjMatrix {
-    matrix: Vec<Vec<f64>>,
-    sum_cols: Vec<f64>,
+    pub matrix: Vec<Vec<f64>>,
+    pub sum_cols: Vec<f64>,
 }
 
 impl NjMatrix {
@@ -30,14 +30,14 @@ pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<PhyloTree> {
         let s = (dist.matrix.len() - 2) as f64;
         let dist_ui = (dist.matrix[i][j] + dist.sum_cols[i] / s - dist.sum_cols[j] / s) / 2.0;
         let dist_uj = dist.matrix[i][j] - dist_ui;
-        t.merge_neighbors(i, j, dist_ui, dist_uj);
+        t.merge_rapid_nj(i, j, dist_ui, dist_uj);
         update_distance_matrix(i, j, &mut dist);
     }
     t = terminate_nj(t, &mut dist);
     Ok(t)
 }
 
-fn terminate_nj(mut t: PhyloTree, d: &mut NjMatrix) -> PhyloTree {
+pub fn terminate_nj(mut t: PhyloTree, d: &mut NjMatrix) -> PhyloTree {
     let (i, j, m) = (t.nodes[&0], t.nodes[&1], t.nodes[&2]);
     let dvi = (d.matrix[0][1] + d.matrix[0][2] - d.matrix[1][2]) / 2.0;
     let dvj = (d.matrix[0][1] + d.matrix[1][2] - d.matrix[0][2]) / 2.0;
@@ -49,7 +49,7 @@ fn terminate_nj(mut t: PhyloTree, d: &mut NjMatrix) -> PhyloTree {
     t
 }
 
-fn update_distance_matrix(i: usize, j: usize, d: &mut NjMatrix) {
+pub fn update_distance_matrix(i: usize, j: usize, d: &mut NjMatrix) {
     let matrix = &mut d.matrix;
     // Remove the ith and jth value to each row
     for k in 0..matrix.len() {
