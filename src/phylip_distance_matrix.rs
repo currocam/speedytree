@@ -1,44 +1,10 @@
+use crate::ResultBox;
 use std::io::{self};
-
-use petgraph::algo;
-
-use crate::{phylogenetic_tree::PhyloTree, ResultBox};
 
 #[derive(Debug)]
 pub struct DistanceMatrix {
     pub matrix: Vec<Vec<f64>>,
     pub names: Vec<String>,
-}
-
-impl From<PhyloTree> for DistanceMatrix {
-    fn from(value: PhyloTree) -> Self {
-        // Ge keys from hash
-        let n_leaves = value.leaves.len();
-        let mut matrix = vec![vec![0.0; n_leaves]; n_leaves];
-        let mut names = Vec::with_capacity(n_leaves);
-        //dbg!(&value.leaves);
-        for i_leaf in 0..n_leaves {
-            let node = value.leaves.get(&i_leaf).unwrap();
-            names.push(value.tree[*node].to_owned());
-        }
-        for i in 0..n_leaves {
-            for j in i..n_leaves {
-                let node_i = value.leaves.get(&i).unwrap();
-                let node_j = value.leaves.get(&j).unwrap();
-                let path = algo::astar(
-                    &value.tree,
-                    *node_i,          // start
-                    |n| n == *node_j, // is_goal
-                    |e| *e.weight(),  // edge_cost
-                    |_| 0.0,          // estimate_cost
-                );
-                matrix[i][j] = path.unwrap().0;
-                matrix[j][i] = matrix[i][j];
-            }
-        }
-
-        DistanceMatrix { matrix, names }
-    }
 }
 
 pub fn read_phylip_distance_matrix<R>(mut reader: R) -> ResultBox<DistanceMatrix>

@@ -3,9 +3,6 @@ use std::collections::HashMap;
 // Binary tree with edge lengths using petgraph
 // graph from petagraph
 use petgraph::{graph::UnGraph, stable_graph::NodeIndex};
-use rand::Rng;
-
-use crate::random_binary_trees::random_unrooted_binary_tree;
 
 #[derive(Debug, Clone)]
 pub struct PhyloTree {
