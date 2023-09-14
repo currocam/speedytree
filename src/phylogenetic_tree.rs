@@ -62,19 +62,6 @@ impl PhyloTree {
         self.tree.add_edge(u, b_node, dbu);
         u
     }
-    pub fn merge_rapid_nj(&mut self, a: usize, b: usize, dau: f64, dbu: f64) -> NodeIndex {
-        // Get nodes to merge
-        let n = self.nodes.len();
-        let u = self.tree.add_node("".to_string());
-        self.nodes.insert(n, u);
-        let a_node = self.nodes.get(&a).unwrap();
-        let b_node = self.nodes.get(&b).unwrap();
-        // Add new edges
-        self.tree.add_edge(u, *a_node, dau);
-        self.tree.add_edge(u, *b_node, dbu);
-        u
-    }
-
     pub fn random(n: usize) -> PhyloTree {
         let leafs = (1..n + 1)
             .map(|x| x.to_string())

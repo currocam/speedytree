@@ -3,13 +3,13 @@ use std::cmp::{max, min};
 use crate::{phylip_distance_matrix::DistanceMatrix, phylogenetic_tree::PhyloTree, ResultBox};
 
 #[derive(Debug)]
-pub struct NjMatrix {
-    pub matrix: Vec<Vec<f64>>,
-    pub sum_cols: Vec<f64>,
+struct NjMatrix {
+    matrix: Vec<Vec<f64>>,
+    sum_cols: Vec<f64>,
 }
 
 impl NjMatrix {
-    pub fn new(d: DistanceMatrix) -> Self {
+    fn new(d: DistanceMatrix) -> Self {
         let matrix = d.matrix;
         let sum_cols = matrix
             .iter()
@@ -30,14 +30,14 @@ pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<PhyloTree> {
         let s = (dist.matrix.len() - 2) as f64;
         let dist_ui = (dist.matrix[i][j] + dist.sum_cols[i] / s - dist.sum_cols[j] / s) / 2.0;
         let dist_uj = dist.matrix[i][j] - dist_ui;
-        t.merge_rapid_nj(i, j, dist_ui, dist_uj);
+        t.merge_neighbors(i, j, dist_ui, dist_uj);
         update_distance_matrix(i, j, &mut dist);
     }
     t = terminate_nj(t, &mut dist);
     Ok(t)
 }
 
-pub fn terminate_nj(mut t: PhyloTree, d: &mut NjMatrix) -> PhyloTree {
+fn terminate_nj(mut t: PhyloTree, d: &mut NjMatrix) -> PhyloTree {
     let (i, j, m) = (t.nodes[&0], t.nodes[&1], t.nodes[&2]);
     let dvi = (d.matrix[0][1] + d.matrix[0][2] - d.matrix[1][2]) / 2.0;
     let dvj = (d.matrix[0][1] + d.matrix[1][2] - d.matrix[0][2]) / 2.0;
@@ -49,7 +49,7 @@ pub fn terminate_nj(mut t: PhyloTree, d: &mut NjMatrix) -> PhyloTree {
     t
 }
 
-pub fn update_distance_matrix(i: usize, j: usize, d: &mut NjMatrix) {
+fn update_distance_matrix(i: usize, j: usize, d: &mut NjMatrix) {
     let matrix = &mut d.matrix;
     // Remove the ith and jth value to each row
     for k in 0..matrix.len() {
@@ -99,7 +99,7 @@ pub fn update_distance_matrix(i: usize, j: usize, d: &mut NjMatrix) {
     d.sum_cols[n - 2] = matrix[n - 2].iter().sum::<f64>();
 }
 
-pub fn find_neighbors(d: &mut NjMatrix) -> (usize, usize) {
+fn find_neighbors(d: &mut NjMatrix) -> (usize, usize) {
     let mut neighbors = (0, 0);
     let mut best_q = f64::INFINITY;
     let matrix = &d.matrix;
@@ -120,8 +120,12 @@ pub fn find_neighbors(d: &mut NjMatrix) -> (usize, usize) {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::vec;
+
+    use petgraph::visit::IntoNeighbors;
+
+    use super::*;
+
     #[test]
     fn test_find_neighbors() {
         let mat = vec![
@@ -208,7 +212,7 @@ mod tests {
     }
     #[test]
     fn test_random_additive_binary_trees() {
-        for i in 6..50 {
+        for i in 4..50 {
             let original_tree: PhyloTree = PhyloTree::random(i);
             let d = DistanceMatrix::from(original_tree.clone());
             let original_tree = original_tree.tree;

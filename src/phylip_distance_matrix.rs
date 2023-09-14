@@ -4,7 +4,7 @@ use petgraph::algo;
 
 use crate::{phylogenetic_tree::PhyloTree, ResultBox};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct DistanceMatrix {
     pub matrix: Vec<Vec<f64>>,
     pub names: Vec<String>,
