@@ -4,6 +4,8 @@ use petgraph::graph::NodeIndex;
 use petgraph::prelude::UnGraph;
 use rand::Rng;
 
+use crate::phylip_distance_matrix::DistanceMatrix;
+
 pub fn random_rooted_binary_tree(leaves: usize) -> UnGraph<String, f64> {
     let mut tree = UnGraph::new_undirected();
     let mut next_node = leaves;
@@ -43,6 +45,27 @@ fn random_unrooted_binary_tree(n_leaves: usize) -> UnGraph<String, f64> {
     let mut rng = rand::thread_rng();
     t.add_edge(a, b, rng.gen_range(0.1..100.0));
     t
+}
+
+pub fn distance_matrix_from_tree(t: UnGraph<String, f64>) -> DistanceMatrix {
+    // Find all leaves
+    let leaves: Vec<NodeIndex> = t
+        .node_indices()
+        .filter(|node| t.edges(*node).count() == 1)
+        .collect();
+    let mut mat = vec![vec![0.0; leaves.len()]; leaves.len()];
+    for (i, a) in leaves.iter().enumerate() {
+        for (j, b) in leaves.iter().enumerate() {
+            mat[i][j] =
+                petgraph::algo::astar(&t, *a, |finish| finish == *b, |e| *e.weight(), |_| 0.0)
+                    .unwrap()
+                    .0;
+        }
+    }
+    DistanceMatrix {
+        names: leaves.iter().map(|node| t[*node].clone()).collect(),
+        matrix: mat,
+    }
 }
 
 #[cfg(test)]
