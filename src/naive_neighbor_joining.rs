@@ -120,34 +120,10 @@ fn find_neighbors(d: &mut NjMatrix) -> (usize, usize) {
 
 #[cfg(test)]
 mod tests {
-    use std::vec;
-
-    use petgraph::visit::IntoNeighbors;
+    use crate::random_binary_trees::distance_matrix_from_tree;
 
     use super::*;
-
-    #[test]
-    fn test_find_neighbors() {
-        let mat = vec![
-            vec![0.0, 5.0, 9.0, 9.0, 8.0],
-            vec![5.0, 0.0, 10.0, 10.0, 9.0],
-            vec![9.0, 10.0, 0.0, 8.0, 7.0],
-            vec![9.0, 10.0, 8.0, 0.0, 3.0],
-            vec![8.0, 9.0, 7.0, 3.0, 0.0],
-        ];
-        let mut mat = NjMatrix::new(DistanceMatrix {
-            matrix: mat,
-            names: vec![
-                "A".to_string(),
-                "B".to_string(),
-                "C".to_string(),
-                "D".to_string(),
-                "E".to_string(),
-            ],
-        });
-        let index = find_neighbors(&mut mat);
-        assert_eq!(index, (0, 1));
-    }
+    use std::vec;
     #[test]
     fn test_example_wikipedia() {
         let mat: Vec<Vec<f64>> = vec![
@@ -213,11 +189,10 @@ mod tests {
     #[test]
     fn test_random_additive_binary_trees() {
         for i in 4..50 {
-            let original_tree: PhyloTree = PhyloTree::random(i);
-            let d = DistanceMatrix::from(original_tree.clone());
-            let original_tree = original_tree.tree;
-            let tree = naive_neighbor_joining(d).unwrap();
-            assert!(petgraph::algo::is_isomorphic(&original_tree, &tree.tree));
+            let original_tree = crate::random_binary_trees::random_unrooted_binary_tree(i);
+            let d = distance_matrix_from_tree(original_tree.clone());
+            let tree = naive_neighbor_joining(d).unwrap().tree;
+            assert!(petgraph::algo::is_isomorphic(&original_tree, &tree));
         }
     }
 }

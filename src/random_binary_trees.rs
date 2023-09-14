@@ -30,7 +30,7 @@ pub fn random_rooted_binary_tree(leaves: usize) -> UnGraph<String, f64> {
     tree
 }
 
-fn random_unrooted_binary_tree(n_leaves: usize) -> UnGraph<String, f64> {
+pub fn random_unrooted_binary_tree(n_leaves: usize) -> UnGraph<String, f64> {
     let mut t = random_rooted_binary_tree(n_leaves);
     // Remove root as node with degree 2
     let root = t

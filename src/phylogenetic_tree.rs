@@ -5,6 +5,8 @@ use std::collections::HashMap;
 use petgraph::{graph::UnGraph, stable_graph::NodeIndex};
 use rand::Rng;
 
+use crate::random_binary_trees::random_unrooted_binary_tree;
+
 #[derive(Debug, Clone)]
 pub struct PhyloTree {
     pub tree: UnGraph<String, f64>,
@@ -61,30 +63,6 @@ impl PhyloTree {
         self.tree.add_edge(u, a_node, dau);
         self.tree.add_edge(u, b_node, dbu);
         u
-    }
-    pub fn random(n: usize) -> PhyloTree {
-        let leafs = (1..n + 1)
-            .map(|x| x.to_string())
-            .rev()
-            .collect::<Vec<String>>();
-        // Shuffle leafs
-        let mut tree = PhyloTree::new(&leafs);
-        let n_nodes_end = 2 * tree.n_unmerged_leaves - 2;
-        let mut previous_internal_node = None;
-        let mut internal_node = None;
-        for _ in 0..n_nodes_end - n {
-            previous_internal_node = internal_node;
-            internal_node = Some(tree.merge_neighbors(0, 1, 0.0, 0.0));
-        }
-        tree.tree
-            .add_edge(previous_internal_node.unwrap(), internal_node.unwrap(), 0.0);
-        // Iterate through all edges and assign random weights
-        let mut rng = rand::thread_rng();
-        for edge in tree.tree.edge_indices() {
-            let weight = rng.gen_range(0.1..10.0);
-            tree.tree[edge] = weight;
-        }
-        tree
     }
 }
 
