@@ -6,7 +6,7 @@ use petgraph::{graph::UnGraph, stable_graph::NodeIndex};
 
 #[derive(Debug, Clone)]
 pub struct PhyloTree {
-    pub tree: UnGraph<String, f64>,
+    pub tree: crate::Tree,
     n_unmerged_leaves: usize,
     pub leaves: HashMap<usize, NodeIndex>,
     pub nodes: HashMap<usize, NodeIndex>,
