@@ -1,30 +1,51 @@
 use fixedbitset::FixedBitSet;
 use petgraph::stable_graph::NodeIndex;
 
-type G = petgraph::Graph<String, f64, petgraph::Undirected>;
+use crate::Tree;
 
-pub fn to_newick(t: &G) -> String {
+fn format_edge_float<'a>(
+    t: &Tree,
+    node: NodeIndex,
+    parent: NodeIndex,
+    buffer: &'a mut dtoa::Buffer,
+) -> &'a str {
+    let e: petgraph::stable_graph::EdgeIndex = t.find_edge(node, parent).unwrap();
+    // Stop using format! for performance, create a string directly
+    buffer.format_finite(*t.edge_weight(e).unwrap())
+}
+
+pub fn to_newick(t: &Tree) -> String {
     // Find a node with 3 children
+    let mut buffer = dtoa::Buffer::new();
     let root = root(t).unwrap();
-    let mut visit = FixedBitSet::with_capacity(t.node_count());
-    fn inner(t: &G, visit: &mut FixedBitSet, node: NodeIndex, parent: NodeIndex) -> String {
+    let mut visited = FixedBitSet::with_capacity(t.node_count());
+    fn inner(
+        t: &Tree,
+        visited: &mut FixedBitSet,
+        node: NodeIndex,
+        parent: NodeIndex,
+        buffer: &mut dtoa::Buffer,
+    ) -> String {
         let mut newick = String::new();
-        visit.insert(node.index());
+        visited.insert(node.index());
         // If leaf
         if !t[node].is_empty() {
-            let e: petgraph::stable_graph::EdgeIndex = t.find_edge(node, parent).unwrap();
-            return format!("{}:{:?}", t[node], t.edge_weight(e).unwrap());
+            // Stop using format! for performance, create a string directly
+            let mut output = t[node].to_owned();
+            output.push_str(":");
+            output.push_str(&format_edge_float(t, node, parent, buffer));
+            return output;
         }
         // If internal node
         let mut children: Vec<NodeIndex> = t.neighbors(node).collect();
         // Filter out visited nodes
-        children.retain(|child| !visit.contains(child.index()));
+        children.retain(|child| !visited.contains(child.index()));
         children.reverse();
         let n_children = children.len();
         newick.push('(');
         for (index, child) in children.into_iter().enumerate() {
-            if !visit.contains(child.index()) {
-                let child_newick = inner(t, visit, child, node);
+            if !visited.contains(child.index()) {
+                let child_newick = inner(t, visited, child, node, buffer);
                 newick.push_str(&child_newick);
                 if index < n_children - 1 {
                     newick.push(',');
@@ -33,16 +54,18 @@ pub fn to_newick(t: &G) -> String {
         }
         newick.push(')');
 
-        let e = t.find_edge(node, parent);
-        if let Some(e) = e {
-            newick.push_str(&format!(":{}", t.edge_weight(e).unwrap()));
+        if t.find_edge(node, parent).is_some() {
+            newick.push_str(":");
+            newick.push_str(format_edge_float(t, node, parent, buffer));
         }
         newick
     }
-    format!("{};", inner(t, &mut visit, root, root))
+    let mut output = inner(t, &mut visited, root, root, &mut buffer);
+    output.push(';');
+    output
 }
 
-fn root(t: &G) -> Option<NodeIndex> {
+fn root(t: &Tree) -> Option<NodeIndex> {
     let mut root = None;
     for node in t.node_indices() {
         if t.neighbors(node).count() == 3 {

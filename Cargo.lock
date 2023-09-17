@@ -6,6 +6,7 @@ version = 3
 name = "birc-rapidnj"
 version = "0.1.0"
 dependencies = [
+ "dtoa",
  "fixedbitset",
  "petgraph",
  "rand",
@@ -16,6 +17,12 @@ name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
+name = "dtoa"
+version = "1.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dcbb2bf8e87535c23f7a8a321e364ce21462d0ff10cb6407820e8e96dfff6653"
 
 [[package]]
 name = "equivalent"

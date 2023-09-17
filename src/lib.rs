@@ -6,7 +6,11 @@ mod random_binary_trees;
 use crate::distances::DistanceMatrix;
 use crate::naive_nj::naive_neighbor_joining;
 use crate::newick::to_newick;
-use std::{error, io, process};
+use std::{
+    error,
+    io::{self, Write},
+    process,
+};
 
 type ResultBox<T> = std::result::Result<T, Box<dyn error::Error>>;
 type Tree = petgraph::graph::UnGraph<String, f64>;
@@ -34,5 +38,10 @@ pub fn run(_config: Config) {
     });
     //dbg!(&tree);
     let graph = &tree;
-    println!("{}", to_newick(graph));
+    io::stdout()
+        .write_all(to_newick(graph).as_bytes())
+        .unwrap_or_else(|err| {
+            eprintln!("{err}");
+            process::exit(1);
+        });
 }
