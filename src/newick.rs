@@ -32,8 +32,8 @@ pub fn to_newick(t: &Tree) -> String {
         if !t[node].is_empty() {
             // Stop using format! for performance, create a string directly
             let mut output = t[node].to_owned();
-            output.push_str(":");
-            output.push_str(&format_edge_float(t, node, parent, buffer));
+            output.push(':');
+            output.push_str(format_edge_float(t, node, parent, buffer));
             return output;
         }
         // If internal node
@@ -55,7 +55,7 @@ pub fn to_newick(t: &Tree) -> String {
         newick.push(')');
 
         if t.find_edge(node, parent).is_some() {
-            newick.push_str(":");
+            newick.push(':');
             newick.push_str(format_edge_float(t, node, parent, buffer));
         }
         newick

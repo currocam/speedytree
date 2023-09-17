@@ -1,7 +1,9 @@
 mod distances;
 mod naive_nj;
 mod newick;
-mod random_binary_trees;
+
+#[cfg(test)]
+mod property_tests;
 
 use crate::distances::DistanceMatrix;
 use crate::naive_nj::naive_neighbor_joining;

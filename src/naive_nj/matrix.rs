@@ -57,8 +57,8 @@ impl QMatrix {
         let dij = matrix[i][j];
         let n = matrix.len();
         // Remove the ith and jth value to each row
-        for k in 0..matrix.len() {
-            sum_cols[k] -= matrix[i][k] + matrix[j][k];
+        for (k, col) in sum_cols.iter_mut().enumerate() {
+            *col -= matrix[i][k] + matrix[j][k];
         }
         // Swap rows
         if j == n - 2 {
@@ -89,8 +89,8 @@ impl QMatrix {
             row.pop();
         }
         // Update the sum_cols with RS_i = RS'_i - x - y + z
-        for index in 0..n - 2 {
-            sum_cols[index] += matrix[n - 2][index];
+        for (index, col) in sum_cols.iter_mut().enumerate().take(n - 2) {
+            *col += matrix[n - 2][index];
         }
         // Compute the sum of the last row
         sum_cols[n - 2] = matrix[n - 2].iter().sum::<f64>();

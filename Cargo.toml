@@ -10,3 +10,8 @@ dtoa = "1.0.9"
 fixedbitset = "0.4.2"
 petgraph = "0.6.4"
 rand = "0.8.5"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"

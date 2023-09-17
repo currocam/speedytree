@@ -5,8 +5,9 @@ use petgraph::prelude::UnGraph;
 use rand::Rng;
 
 use crate::distances::DistanceMatrix;
+use crate::Tree;
 
-pub fn random_rooted_binary_tree(leaves: usize) -> UnGraph<String, f64> {
+fn random_rooted_binary_tree(leaves: usize) -> UnGraph<String, f64> {
     let mut tree = UnGraph::new_undirected();
     let mut next_node = leaves;
     let mut nodes: Vec<NodeIndex> = (0..leaves).map(|_| tree.add_node("".to_string())).collect();
@@ -47,7 +48,7 @@ pub fn random_unrooted_binary_tree(n_leaves: usize) -> UnGraph<String, f64> {
     t
 }
 
-pub fn distance_matrix_from_tree(t: UnGraph<String, f64>) -> DistanceMatrix {
+pub fn distance_matrix_from_tree(t: Tree) -> DistanceMatrix {
     // Find all leaves
     let leaves: Vec<NodeIndex> = t
         .node_indices()
