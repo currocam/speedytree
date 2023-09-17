@@ -1,8 +1,8 @@
-use crate::{phylip_distance_matrix::DistanceMatrix, phylogenetic_tree::PhyloTree, ResultBox};
+use crate::{phylip_distance_matrix::DistanceMatrix, ResultBox, Tree};
 
-use super::matrix::QMatrix;
+use super::{matrix::QMatrix, phylo_tree::PhyloTree};
 
-pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<PhyloTree> {
+pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<Tree> {
     let mut t = PhyloTree::new(&dist.names);
     let mut q = QMatrix::new(dist);
 
@@ -14,18 +14,77 @@ pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<PhyloTree> {
         q.update_distance_matrix(i, j);
     }
 
-    t = terminate_nj(t, q);
-    Ok(t)
+    Ok(terminate_nj(t, q))
 }
 
-fn terminate_nj(mut t: PhyloTree, q: QMatrix) -> PhyloTree {
-    let (i, j, m) = (t.nodes[&0], t.nodes[&1], t.nodes[&2]);
+fn terminate_nj(tree: PhyloTree, q: QMatrix) -> Tree {
+    let (i, j, m) = (tree.nodes[&0], tree.nodes[&1], tree.nodes[&2]);
+    let mut tree = tree.tree;
+
     let dvi = (q.distance(0, 1) + q.distance(0, 2) - q.distance(1, 2)) / 2.0;
     let dvj = (q.distance(0, 1) + q.distance(1, 2) - q.distance(0, 2)) / 2.0;
     let dvm = (q.distance(0, 2) + q.distance(1, 2) - q.distance(0, 1)) / 2.0;
-    let v = t.tree.add_node("".to_owned());
-    t.tree.add_edge(v, i, dvi);
-    t.tree.add_edge(v, j, dvj);
-    t.tree.add_edge(v, m, dvm);
-    t
+
+    let v = tree.add_node("".to_owned());
+    tree.add_edge(v, i, dvi);
+    tree.add_edge(v, j, dvj);
+    tree.add_edge(v, m, dvm);
+
+    tree
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_example_wikipedia() {
+        let d = DistanceMatrix {
+            matrix: vec![
+                vec![0.0, 5.0, 9.0, 9.0, 8.0],
+                vec![5.0, 0.0, 10.0, 10.0, 9.0],
+                vec![9.0, 10.0, 0.0, 8.0, 7.0],
+                vec![9.0, 10.0, 8.0, 0.0, 3.0],
+                vec![8.0, 9.0, 7.0, 3.0, 0.0],
+            ],
+            names: vec![
+                "A".to_string(),
+                "B".to_string(),
+                "C".to_string(),
+                "D".to_string(),
+                "E".to_string(),
+            ],
+        };
+
+        let phylo = naive_neighbor_joining(d);
+        assert!(phylo.is_ok());
+
+        let tree = phylo.unwrap();
+        let mut node_indices = tree.node_indices();
+        let (a, b, c, d, e) = (
+            node_indices.next().unwrap(),
+            node_indices.next().unwrap(),
+            node_indices.next().unwrap(),
+            node_indices.next().unwrap(),
+            node_indices.next().unwrap(),
+        );
+
+        // Get internal nodes
+        let u = tree.neighbors(a).next().unwrap();
+        let w = tree.neighbors(e).next().unwrap();
+        let v = tree.neighbors(c).next().unwrap();
+
+        // Create array of node from, node to and distance
+        let expected = [
+            (a, u, 2.0),
+            (b, u, 3.0),
+            (e, w, 1.0),
+            (d, w, 2.0),
+            (c, v, 4.0),
+            (v, u, 3.0),
+            (v, w, 2.0),
+        ];
+        for (a, b, dist) in expected.into_iter() {
+            assert_eq!(tree.edge_weight(tree.find_edge(a, b).unwrap()), Some(&dist));
+        }
+    }
 }
