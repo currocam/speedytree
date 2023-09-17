@@ -1,6 +1,6 @@
 use std::cmp;
 
-use crate::phylip_distance_matrix::DistanceMatrix;
+use crate::distances::DistanceMatrix;
 
 #[derive(Debug)]
 pub struct QMatrix {

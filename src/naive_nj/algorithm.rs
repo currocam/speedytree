@@ -1,4 +1,4 @@
-use crate::{phylip_distance_matrix::DistanceMatrix, ResultBox, Tree};
+use crate::{distances::DistanceMatrix, ResultBox, Tree};
 
 use super::{matrix::QMatrix, phylo_tree::PhyloTree};
 

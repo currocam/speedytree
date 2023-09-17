@@ -4,7 +4,7 @@ use petgraph::graph::NodeIndex;
 use petgraph::prelude::UnGraph;
 use rand::Rng;
 
-use crate::phylip_distance_matrix::DistanceMatrix;
+use crate::distances::DistanceMatrix;
 
 pub fn random_rooted_binary_tree(leaves: usize) -> UnGraph<String, f64> {
     let mut tree = UnGraph::new_undirected();

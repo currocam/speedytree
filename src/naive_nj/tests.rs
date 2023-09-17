@@ -1,9 +1,7 @@
 #[cfg(test)]
 mod tests {
+    use crate::naive_nj::algorithm::naive_neighbor_joining;
     use crate::random_binary_trees::distance_matrix_from_tree;
-    use crate::{
-        naive_nj::algorithm::naive_neighbor_joining, phylip_distance_matrix::DistanceMatrix,
-    };
 
     #[test]
     fn test_random_additive_binary_trees() {
