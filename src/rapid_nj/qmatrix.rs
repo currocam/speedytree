@@ -1,10 +1,9 @@
-use fixedbitset::FixedBitSet;
-
 use crate::distances::DistanceMatrix;
 use crate::rapid_nj::node::Node;
+use std::cmp::Ordering;
 use std::collections::BTreeSet;
 
-struct QMatrix {
+pub struct QMatrix {
     distances: Vec<Option<Vec<f64>>>,
     sum_cols: Vec<Option<f64>>,
     trees: Vec<Option<BTreeSet<Node>>>,
@@ -15,21 +14,13 @@ struct QMatrix {
 
 impl QMatrix {
     pub fn distance(&self, i: usize, j: usize) -> f64 {
-        if i == j {
-            0.0
-        } else if i < j {
-            self.distances[i].as_ref().unwrap()[j - i - 1]
-        } else {
-            self.distances[j].as_ref().unwrap()[i - j - 1]
-        }
+        Self::distances_vec(&self.distances, i, j)
     }
-    pub fn distances_vec(distances: &Vec<Option<Vec<f64>>>, i: usize, j: usize) -> f64 {
-        if i == j {
-            0.0
-        } else if i < j {
-            distances[i].as_ref().unwrap()[j - i - 1]
-        } else {
-            distances[j].as_ref().unwrap()[i - j - 1]
+    pub fn distances_vec(distances: &[Option<Vec<f64>>], i: usize, j: usize) -> f64 {
+        match i.cmp(&j) {
+            Ordering::Less => distances[i].as_ref().unwrap()[j - i - 1],
+            Ordering::Greater => distances[j].as_ref().unwrap()[i - j - 1],
+            Ordering::Equal => 0.0,
         }
     }
 
@@ -43,7 +34,11 @@ impl QMatrix {
             let tree = tree.as_ref().unwrap();
             for node in tree.iter() {
                 let j = node.index;
-                if self.distance(i, j) - self.sum_cols[i].unwrap() - self.u_max >= qmin {
+                if (self.n_leaves as f64 - 2.0) * self.distance(i, j)
+                    - self.sum_cols[i].unwrap()
+                    - self.u_max
+                    >= qmin
+                {
                     break;
                 }
                 let q = (self.n_leaves as f64 - 2.0) * self.distance(i, j)
@@ -57,7 +52,7 @@ impl QMatrix {
         }
         min_index
     }
-    fn update(&mut self, i: usize, j: usize) {
+    pub fn update(&mut self, i: usize, j: usize) {
         self.trees[i] = None;
         self.trees[j] = None;
         self.sum_cols[i] = None;
@@ -91,6 +86,26 @@ impl QMatrix {
         self.distances[j] = None;
         self.trees.push(Some(BTreeSet::new()));
     }
+
+    pub fn n_leaves(&self) -> usize {
+        self.n_leaves
+    }
+    pub fn new_node_distances(&self, i: usize, j: usize) -> (f64, f64) {
+        let s = (self.n_leaves() - 2) as f64;
+        let dist_ui =
+            self.distance(i, j) + self.sum_cols[i].unwrap() / s - self.sum_cols[j].unwrap() / s;
+        (dist_ui / 2.0, self.distance(i, j) - dist_ui / 2.0)
+    }
+    pub fn unmerged_nodes(&self) -> Vec<usize> {
+        // Get index of all Some valyes in self.trees
+        let mut unmerged = Vec::new();
+        for (i, vct) in self.distances.iter().enumerate() {
+            if vct.is_some() {
+                unmerged.push(i);
+            }
+        }
+        unmerged
+    }
 }
 
 // Implement from DistanceMatrix
@@ -110,10 +125,10 @@ impl From<&DistanceMatrix> for QMatrix {
             .unwrap()
             .unwrap();
         let mut distances = Vec::with_capacity(n);
-        for i in 0..n {
+        for (i, whole_row) in matrix.iter().enumerate() {
             let mut row = Vec::with_capacity(n - i - 1);
-            for j in i + 1..n {
-                row.push(matrix[i][j]);
+            for distance in whole_row.iter().skip(i + 1) {
+                row.push(*distance);
             }
             distances.push(Some(row));
         }

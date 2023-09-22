@@ -2,7 +2,7 @@ use std::io::{self, Read, Write};
 use std::process::{Command, Stdio};
 
 #[test]
-fn wikipedia_example() {
+fn wikipedia_example_naive() {
     //https://en.wikipedia.org/wiki/Neighbor_joining
     let input = "5
     a	0	5	9	9	8
@@ -15,6 +15,7 @@ fn wikipedia_example() {
     let expected_output = "((c:4.0,(d:2.0,e:1.0):2.0):3.0,a:2.0,b:3.0);";
 
     let mut child = Command::new("target/debug/birc-rapidnj")
+        .arg("--naive")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
@@ -38,7 +39,7 @@ fn wikipedia_example() {
 }
 
 #[test]
-fn simple_tree() {
+fn simple_tree_naive() {
     let input = "6
     Mouse     0.0000 1.5232 1.4841 1.4465 1.4389 1.4629 
     Gibbon    1.5232 0.0000 0.7115 0.5958 0.6179 0.5583 
@@ -51,6 +52,7 @@ fn simple_tree() {
     // Parse the output so only one decimal place is shown
 
     let mut child = Command::new("target/debug/birc-rapidnj")
+        .arg("--naive")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
