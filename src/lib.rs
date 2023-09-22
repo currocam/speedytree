@@ -1,6 +1,7 @@
 mod distances;
 mod naive_nj;
 mod newick;
+mod rapid_nj;
 
 #[cfg(test)]
 mod property_tests;

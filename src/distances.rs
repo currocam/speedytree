@@ -31,6 +31,9 @@ impl DistanceMatrix {
         }
         Ok(DistanceMatrix { matrix, names })
     }
+    pub fn size(&self) -> usize {
+        self.matrix.len()
+    }
 }
 
 // Test
