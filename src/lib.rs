@@ -1,3 +1,5 @@
+#![feature(allocator_api)]
+#![feature(btreemap_alloc)]
 mod distances;
 mod naive_nj;
 mod newick;

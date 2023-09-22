@@ -84,7 +84,7 @@ impl QMatrix {
         self.distances.push(Some(Vec::with_capacity(self.n_leaves))); // Maybe add with capacity
         self.distances[i] = None;
         self.distances[j] = None;
-        self.trees.push(Some(BTreeSet::new()));
+        self.trees.push(Some(BTreeSet::new_in(std::alloc::Global)));
     }
 
     pub fn n_leaves(&self) -> usize {

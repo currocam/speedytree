@@ -1,3 +1,5 @@
+#![feature(allocator_api)]
+#![feature(btreemap_alloc)]
 use birc_rapidnj::{run, Config};
 use std::process;
 
