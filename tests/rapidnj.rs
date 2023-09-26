@@ -12,7 +12,7 @@ fn wikipedia_example_rapid() {
     e	8	9	7	3	0
 ";
 
-    let expected_output = "(((d:2.0,e:1.0):2.0,c:4.0):3.0,a:2.0,b:3.0);";
+    let expected_output = "((c:4.0,(d:2.0,e:1.0):2.0):3.0,a:2.0,b:3.0);";
 
     let mut child = Command::new("target/debug/birc-rapidnj")
         .arg("--rapid")

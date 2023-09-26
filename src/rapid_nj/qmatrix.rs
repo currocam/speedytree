@@ -1,11 +1,12 @@
 use crate::distances::DistanceMatrix;
 use crate::rapid_nj::node::Node;
-use im::OrdSet;
 use std::cmp::Ordering;
+use std::collections::BTreeSet;
+
 pub struct QMatrix {
     distances: Vec<Option<Vec<f64>>>,
     sum_cols: Vec<Option<f64>>,
-    trees: Vec<Option<OrdSet<Node>>>,
+    trees: Vec<Option<BTreeSet<Node>>>,
     u_max: f64,
     n: usize,
     n_leaves: usize,
@@ -83,7 +84,7 @@ impl QMatrix {
         self.distances.push(Some(Vec::with_capacity(self.n_leaves))); // Maybe add with capacity
         self.distances[i] = None;
         self.distances[j] = None;
-        self.trees.push(Some(OrdSet::new()));
+        self.trees.push(Some(BTreeSet::new_in(std::alloc::Global)));
     }
 
     pub fn n_leaves(&self) -> usize {
@@ -133,7 +134,7 @@ impl From<&DistanceMatrix> for QMatrix {
         }
         let mut trees = Vec::with_capacity(n);
         for (row_index, row) in distances.iter().enumerate() {
-            let mut tree = OrdSet::new();
+            let mut tree = BTreeSet::new();
             for (col_index, value) in row.as_ref().unwrap().iter().enumerate() {
                 tree.insert(Node::new(col_index + row_index + 1, *value));
             }
@@ -219,8 +220,7 @@ mod tests {
             q.sum_cols,
             vec![None, None, Some(22.0), Some(18.0), Some(16.0), Some(20.0)]
         );
-        // Either (3, 4) or (2, 5)
-        assert!(q.find_neighbors() == (3, 4) || q.find_neighbors() == (2, 5));
+        assert_eq!(q.find_neighbors(), (3, 4));
         q.update(3, 4);
         assert_eq!(
             &q.distances,
