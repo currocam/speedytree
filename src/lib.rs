@@ -3,10 +3,8 @@
 mod distances;
 mod naive_nj;
 mod newick;
-mod rapid_nj;
-
-#[cfg(test)]
-mod property_tests;
+pub mod property_tests;
+pub mod rapid_nj;
 
 use crate::distances::DistanceMatrix;
 use crate::naive_nj::naive_neighbor_joining;

@@ -80,7 +80,7 @@ fn root(t: &Tree) -> Option<NodeIndex> {
 
 #[cfg(test)]
 mod tests {
-    use petgraph::{graph, stable_graph::NodeIndex};
+    use petgraph::{stable_graph::NodeIndex};
 
     use super::*;
     #[test]

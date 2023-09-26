@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Node {
     pub index: usize,
     pub value: f64,
@@ -16,11 +16,13 @@ impl PartialEq for Node {
     }
 }
 impl Eq for Node {}
+
 impl PartialOrd for Node {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.value.partial_cmp(&other.value)
+        Some(self.cmp(other))
     }
 }
+
 impl Ord for Node {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.value.partial_cmp(&other.value).unwrap()

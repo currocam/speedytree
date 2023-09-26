@@ -8,9 +8,17 @@ edition = "2021"
 [dependencies]
 dtoa = "1.0.9"
 fixedbitset = "0.4.2"
+im = "15.1.0"
 petgraph = "0.6.4"
 rand = "0.8.5"
 [profile.release]
 lto = true
 codegen-units = 1
 panic = "abort"
+
+[dev-dependencies]
+criterion = { version = "0.4", features = ["html_reports"] }
+
+[[bench]]
+name = "rapidnj"
+harness = false
