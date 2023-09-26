@@ -1,7 +1,7 @@
 use crate::ResultBox;
 use std::io::{self};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DistanceMatrix {
     pub matrix: Vec<Vec<f64>>,
     pub names: Vec<String>,
@@ -30,6 +30,9 @@ impl DistanceMatrix {
             );
         }
         Ok(DistanceMatrix { matrix, names })
+    }
+    pub fn size(&self) -> usize {
+        self.matrix.len()
     }
 }
 
