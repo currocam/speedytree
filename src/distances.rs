@@ -1,3 +1,5 @@
+use rand::seq::SliceRandom;
+
 use crate::ResultBox;
 use std::io::{self};
 
@@ -33,6 +35,23 @@ impl DistanceMatrix {
     }
     pub fn size(&self) -> usize {
         self.matrix.len()
+    }
+    pub fn permutate(&mut self) {
+        let mut rng = rand::thread_rng();
+        let mut perm = (0..self.size()).collect::<Vec<usize>>();
+        perm.shuffle(&mut rng);
+        let mut new_matrix = vec![vec![0.0; self.size()]; self.size()];
+        for i in 0..self.size() {
+            for j in 0..self.size() {
+                new_matrix[i][j] = self.matrix[perm[i]][perm[j]];
+            }
+        }
+        self.matrix = new_matrix;
+        let mut new_names = vec![String::new(); self.size()];
+        for i in 0..self.size() {
+            new_names[i] = self.names[perm[i]].clone();
+        }
+        self.names = new_names;
     }
 }
 
