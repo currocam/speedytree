@@ -5,7 +5,6 @@ use super::{matrix::QMatrix, phylo_tree::PhyloTree};
 pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<Tree> {
     let mut t = PhyloTree::new(&dist.names);
     let mut q = QMatrix::new(dist);
-
     while q.n_leaves() > 3 {
         // Find the minimum element in the distance matrix
         let (i, j) = q.find_neighbors();

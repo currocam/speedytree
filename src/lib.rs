@@ -29,6 +29,7 @@ enum Algorithm {
 #[derive(Debug)]
 pub struct Config {
     algo: Algorithm,
+    threads: usize,
 }
 
 impl Config {
@@ -50,12 +51,47 @@ impl Config {
             },
             None => Algorithm::Naive,
         };
-        Ok(Config { algo })
+
+        // Parse the number of threads, format -j 2 or -j2
+        let threads = match args.next() {
+            Some(threads) => match threads.as_str() {
+                "-j" => match args.next() {
+                    Some(threads) => match threads.parse::<usize>() {
+                        Ok(threads) => threads,
+                        Err(_) => {
+                            return Err(From::from(format!(
+                                "Invalid number of threads: {}. \n{}",
+                                threads, error_msg
+                            )))
+                        }
+                    },
+                    None => {
+                        return Err(From::from(format!(
+                            "Invalid number of threads: {}. \n{}",
+                            threads, error_msg
+                        )))
+                    }
+                },
+                _ => {
+                    return Err(From::from(format!(
+                        "Invalid number of threads: {}. \n{}",
+                        threads, error_msg
+                    )))
+                }
+            },
+            None => 1,
+        };
+        Ok(Config { algo, threads })
     }
 }
 
 pub fn run(config: Config) {
     //dbg!(&config);
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(config.threads)
+        .build_global()
+        .unwrap();
+
     let reader = io::stdin().lock();
     let d = DistanceMatrix::build_from_phylip(reader).unwrap_or_else(|err| {
         eprintln!("{err}");
