@@ -7,6 +7,7 @@ pub struct QMatrix {
     distances: Vec<Option<Vec<f64>>>,
     sum_cols: Vec<Option<f64>>,
     trees: Vec<Option<BTreeSet<Node>>>,
+    sorted_index: Vec<usize>,
     u_max: f64,
     n: usize,
     n_leaves: usize,
@@ -27,7 +28,9 @@ impl QMatrix {
     pub fn find_neighbors(&self) -> (usize, usize) {
         let mut qmin = f64::INFINITY;
         let mut min_index = (0, 0);
-        for (i, tree) in self.trees.iter().enumerate() {
+        for i in &self.sorted_index {
+            let i = *i;
+            let tree = self.trees[i].as_ref();
             if tree.is_none() {
                 continue;
             }
@@ -57,8 +60,10 @@ impl QMatrix {
         self.trees[j] = None;
         self.sum_cols[i] = None;
         self.sum_cols[j] = None;
+        self.sorted_index.retain(|&x| x != i && x != j);
         let distances = &mut self.distances;
         self.sum_cols.push(Some(0.0));
+        self.sorted_index.push(self.n);
         for (m, row) in self.trees.iter_mut().enumerate() {
             if row.is_none() {
                 continue;
@@ -85,6 +90,7 @@ impl QMatrix {
         self.distances[i] = None;
         self.distances[j] = None;
         self.trees.push(Some(BTreeSet::new_in(std::alloc::Global)));
+        sort_index(&mut self.sorted_index, &self.sum_cols);
     }
 
     pub fn n_leaves(&self) -> usize {
@@ -140,15 +146,30 @@ impl From<&DistanceMatrix> for QMatrix {
             }
             trees.push(Some(tree));
         }
+        let mut sorted_index: Vec<usize> = (0..n).collect();
+        // Sort according to sum_cols[i]
+        sort_index(&mut sorted_index, &sum_cols);
+
         QMatrix {
             distances,
             sum_cols,
             trees,
+            sorted_index,
             u_max,
             n,
             n_leaves,
         }
     }
+}
+
+fn sort_index(sorted_index: &mut [usize], sum_cols: &[Option<f64>]) {
+    // Sort, maximum, decreasing and unstable
+    sorted_index.sort_unstable_by(|a, b| {
+        sum_cols[*b]
+            .unwrap()
+            .partial_cmp(&sum_cols[*a].unwrap())
+            .unwrap()
+    });
 }
 
 // Test QMatrix::from
