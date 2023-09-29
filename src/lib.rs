@@ -34,12 +34,19 @@ pub struct Config {
 impl Config {
     pub fn build(mut args: impl Iterator<Item = String>) -> ResultBox<Config> {
         // Let match the algorithm, if not specified, use Naive
+        let error_msg = "Usage: nj [-r|--rapid] [-n|--naive] < input.phy > output.nwk";
         args.next(); // Skip the first argument
         let algo = match args.next() {
             Some(algo) => match algo.as_str() {
                 "-r" | "--rapid" => Algorithm::Rapid,
                 "-n" | "--naive" => Algorithm::Naive,
-                _ => Algorithm::Naive,
+                _ => {
+                    return Err(From::from(format!(
+                        "Invalid algorithm: {}. \n{}",
+                        algo.as_str(),
+                        error_msg
+                    )))
+                }
             },
             None => Algorithm::Naive,
         };
