@@ -3,8 +3,8 @@ use crate::{distances::DistanceMatrix, ResultBox, Tree};
 use super::{matrix::QMatrix, phylo_tree::PhyloTree};
 
 pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<Tree> {
-    let mut t = PhyloTree::new(&dist.names);
-    let mut q = QMatrix::new(dist);
+    let mut t = PhyloTree::build(&dist.names);
+    let mut q = QMatrix::build(dist);
     while q.n_leaves() > 3 {
         // Find the minimum element in the distance matrix
         let (i, j) = q.find_neighbors();
@@ -16,7 +16,7 @@ pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<Tree> {
     Ok(terminate_nj(t, q))
 }
 
-fn terminate_nj(tree: PhyloTree, q: QMatrix) -> Tree {
+pub fn terminate_nj(tree: PhyloTree, q: QMatrix) -> Tree {
     let (i, j, m) = (tree.nodes[&0], tree.nodes[&1], tree.nodes[&2]);
     let mut tree = tree.tree;
 

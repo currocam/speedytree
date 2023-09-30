@@ -9,6 +9,9 @@ pub struct QMatrix {
 }
 
 impl QMatrix {
+    pub fn new (matrix: Vec<Vec<f64>>, sum_cols: Vec<f64>) -> Self {
+        Self { matrix, sum_cols }
+    }
     pub fn n_leaves(&self) -> usize {
         self.matrix.len()
     }
@@ -21,7 +24,7 @@ impl QMatrix {
         (dist_ui / 2.0, self.distance(i, j) - dist_ui / 2.0)
     }
 
-    pub fn new(d: DistanceMatrix) -> Self {
+    pub fn build(d: DistanceMatrix) -> Self {
         let matrix = d.matrix;
         let sum_cols = matrix
             .iter()

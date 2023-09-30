@@ -4,7 +4,7 @@ use super::{phylo_tree::PhyloTree, qmatrix::QMatrix};
 
 pub fn rapid_nj(dist: DistanceMatrix) -> ResultBox<Tree> {
     let mut q = QMatrix::from(&dist);
-    let mut t = PhyloTree::new(&dist.names);
+    let mut t = PhyloTree::build(&dist.names);
     while q.n_leaves() > 3 {
         // Find the minimum element in the distance matrix
         let (i, j) = q.find_neighbors();

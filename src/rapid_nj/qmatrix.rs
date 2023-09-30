@@ -6,8 +6,8 @@ use std::collections::BTreeSet;
 use std::sync::{Arc, Mutex};
 
 pub struct QMatrix {
-    distances: Vec<Option<Vec<f64>>>,
-    sum_cols: Vec<Option<f64>>,
+    pub distances: Vec<Option<Vec<f64>>>,
+    pub sum_cols: Vec<Option<f64>>,
     trees: Vec<Option<BTreeSet<Node>>>,
     u_max: f64,
     n: usize,
@@ -145,7 +145,6 @@ impl QMatrix {
 }
 
 // Implement from DistanceMatrix
-
 impl From<&DistanceMatrix> for QMatrix {
     fn from(d: &DistanceMatrix) -> Self {
         let n = d.size();

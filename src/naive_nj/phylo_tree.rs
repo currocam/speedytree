@@ -8,12 +8,19 @@ use petgraph::{graph::UnGraph, stable_graph::NodeIndex};
 pub struct PhyloTree {
     pub tree: crate::Tree,
     n_unmerged_leaves: usize,
-    pub leaves: HashMap<usize, NodeIndex>,
     pub nodes: HashMap<usize, NodeIndex>,
 }
 
 impl PhyloTree {
-    pub fn new(leafs: &Vec<String>) -> PhyloTree {
+    pub fn new(tree: crate::Tree, nodes: HashMap<usize, NodeIndex>) -> PhyloTree {
+        let n_unmerged_leaves = nodes.len();
+        PhyloTree {
+            tree,
+            n_unmerged_leaves,
+            nodes,
+        }
+    }
+    pub fn build(leafs: &Vec<String>) -> PhyloTree {
         let mut tree: petgraph::Graph<String, f64, petgraph::Undirected> =
             UnGraph::new_undirected();
         let mut nodes = HashMap::new();
@@ -22,12 +29,10 @@ impl PhyloTree {
             //tree.add_edge(root, node, 0.0);
             nodes.insert(i, node);
         }
-        let n_leaves = leafs.len();
+        let n_leaves: usize = leafs.len();
         let n_unmerged_leaves = n_leaves;
-        let leaves = nodes.clone();
         PhyloTree {
             tree,
-            leaves,
             nodes,
             n_unmerged_leaves,
         }
@@ -69,7 +74,7 @@ mod tests {
     use super::*;
     #[test]
     fn test_new() {
-        let tree = PhyloTree::new(&vec![
+        let tree = PhyloTree::build(&vec![
             "A".to_string(),
             "B".to_string(),
             "C".to_string(),

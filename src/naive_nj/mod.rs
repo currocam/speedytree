@@ -6,3 +6,10 @@ mod matrix;
 mod phylo_tree;
 // Export the public interface of the Naive Neighbor Joining algorithm.
 pub use algorithm::naive_neighbor_joining;
+pub use matrix::QMatrix;
+pub use phylo_tree::PhyloTree;
+pub use algorithm::terminate_nj;
+pub struct DataNaiveNJ {
+    pub qmatrix : matrix::QMatrix,
+    pub phylo_tree : phylo_tree::PhyloTree,
+}

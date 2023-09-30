@@ -10,7 +10,7 @@ pub struct PhyloTree {
 }
 
 impl PhyloTree {
-    pub fn new(leafs: &Vec<String>) -> PhyloTree {
+    pub fn build(leafs: &Vec<String>) -> PhyloTree {
         let mut tree: petgraph::Graph<String, f64, petgraph::Undirected> =
             UnGraph::new_undirected();
         let mut nodes = HashMap::new();

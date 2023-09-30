@@ -3,8 +3,11 @@
 mod distances;
 mod naive_nj;
 mod newick;
+pub mod algo;
 pub mod property_tests;
 pub mod rapid_nj;
+
+use algo::neighbor_joining;
 
 use crate::distances::DistanceMatrix;
 use crate::naive_nj::naive_neighbor_joining;
@@ -23,7 +26,8 @@ type Tree = petgraph::graph::UnGraph<String, f64>;
 #[derive(Debug)]
 enum Algorithm {
     Naive,
-    Rapid,
+    RapidNJ,
+    Hybrid,
 }
 
 #[derive(Debug)]
@@ -39,8 +43,9 @@ impl Config {
         args.next(); // Skip the first argument
         let algo = match args.next() {
             Some(algo) => match algo.as_str() {
-                "-r" | "--rapid" => Algorithm::Rapid,
+                "-r" | "--rapid" => Algorithm::RapidNJ,
                 "-n" | "--naive" => Algorithm::Naive,
+                "-h" | "--hybrid" => Algorithm::Hybrid,
                 _ => {
                     return Err(From::from(format!(
                         "Invalid algorithm: {}. \n{}",
@@ -49,7 +54,7 @@ impl Config {
                     )))
                 }
             },
-            None => Algorithm::Naive,
+            None => Algorithm::Hybrid,
         };
 
         // Parse the number of threads, format -j 2 or -j2
@@ -102,7 +107,11 @@ pub fn run(config: Config) {
     //dbg!(&d);
     let d = match config.algo {
         Algorithm::Naive => naive_neighbor_joining(d),
-        Algorithm::Rapid => rapid_nj(d),
+        Algorithm::RapidNJ => rapid_nj(d),
+        Algorithm::Hybrid => {
+            let n = d.size();
+            neighbor_joining(d, n - n/5)
+        }
     };
     let graph = d.unwrap_or_else(|err| {
         eprintln!("{err}");
