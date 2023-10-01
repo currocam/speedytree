@@ -2,13 +2,16 @@ use rand::seq::SliceRandom;
 
 use crate::ResultBox;
 use std::io::{self};
-
+/// Distance matrix struct
 #[derive(Debug, Clone)]
 pub struct DistanceMatrix {
+    /// Distance matrix as a vector of vectors
     pub matrix: Vec<Vec<f64>>,
+    /// Names of the sequences
     pub names: Vec<String>,
 }
 
+/// Distance matrix from a phylip file
 impl DistanceMatrix {
     pub fn build_from_phylip<R>(mut reader: R) -> ResultBox<DistanceMatrix>
     where
@@ -33,9 +36,11 @@ impl DistanceMatrix {
         }
         Ok(DistanceMatrix { matrix, names })
     }
+    /// Size of the distance matrix
     pub fn size(&self) -> usize {
         self.matrix.len()
     }
+    /// Permutate the distance matrix for testing purposes
     pub fn permutate(&mut self) {
         let mut rng = rand::thread_rng();
         let mut perm = (0..self.size()).collect::<Vec<usize>>();
@@ -52,6 +57,25 @@ impl DistanceMatrix {
             new_names[i] = self.names[perm[i]].clone();
         }
         self.names = new_names;
+    }
+    /// Example from Wikipedia, https://en.wikipedia.org/wiki/Neighbor_joining
+    pub fn wikipedia_example() -> DistanceMatrix {
+        DistanceMatrix {
+            matrix: vec![
+                vec![0.0, 5.0, 9.0, 9.0, 8.0],
+                vec![5.0, 0.0, 10.0, 10.0, 9.0],
+                vec![9.0, 10.0, 0.0, 8.0, 7.0],
+                vec![9.0, 10.0, 8.0, 0.0, 3.0],
+                vec![8.0, 9.0, 7.0, 3.0, 0.0],
+            ],
+            names: vec![
+                "A".to_string(),
+                "B".to_string(),
+                "C".to_string(),
+                "D".to_string(),
+                "E".to_string(),
+            ],
+        }
     }
 }
 

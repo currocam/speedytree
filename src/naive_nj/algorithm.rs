@@ -1,6 +1,6 @@
 use crate::{distances::DistanceMatrix, ResultBox, Tree};
 
-use super::{matrix::QMatrix, phylo_tree::PhyloTree};
+use super::{phylo_tree::PhyloTree, qmatrix::QMatrix};
 
 pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<Tree> {
     let mut t = PhyloTree::build(&dist.names);

@@ -1,5 +1,5 @@
 [package]
-name = "birc-rapidnj"
+name = "speedytree"
 version = "0.1.0"
 edition = "2021"
 
@@ -18,10 +18,3 @@ rb_tree = "0.5.0"
 lto = true
 codegen-units = 1
 panic = "abort"
-
-[dev-dependencies]
-criterion = { version = "0.4", features = ["html_reports"] }
-
-[[bench]]
-name = "rapidnj"
-harness = false

@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use bit_set::BitSet;
 
 use crate::Tree;
-
+/// Calculate the Robinson-Foulds distance between two trees
 pub fn distance(a: Tree, b: Tree) -> usize {
     // Create a map from leaves to number according to their lexicographic order
     let mut leaves: Vec<String> = a

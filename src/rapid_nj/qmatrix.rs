@@ -1,9 +1,9 @@
 use crate::distances::DistanceMatrix;
 use crate::rapid_nj::node::Node;
+use parking_lot::RwLock;
 use rayon::prelude::*;
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
-use parking_lot::RwLock;
 
 pub struct QMatrix {
     pub distances: Vec<Option<Vec<f64>>>,
@@ -32,46 +32,44 @@ impl QMatrix {
         let qmin_shared = RwLock::new(f64::INFINITY); // Shared q_min
         let min_index_shared = RwLock::new((0, 0)); // Shared min_index
         let chunk_size = 30;
-        self.indexes
-            .par_chunks(chunk_size)
-            .for_each(|indexes| {
-                let mut qmin;
-                let mut min_index = (0, 0);
-                {
-                    let qmin_shared = qmin_shared.read();
-                    qmin = *qmin_shared;
-                }
-                // While let some tree
-                for i in indexes.iter() {
-                    if let Some(tree) = &self.trees[*i] {
-                        for node in tree.iter() {
-                            let j = node.index;
-                            if (self.n_leaves as f64 - 2.0) * self.distance(*i, j)
-                                - self.sum_cols[*i].unwrap()
-                                - self.u_max
-                                >= qmin
-                            {
-                                break;
-                            }
-                            let q = (self.n_leaves as f64 - 2.0) * self.distance(*i, j)
-                                - self.sum_cols[*i].unwrap()
-                                - self.sum_cols[j].unwrap();
-                            if q < qmin {
-                                qmin = q;
-                                min_index = (*i, j);
-                            }
+        self.indexes.par_chunks(chunk_size).for_each(|indexes| {
+            let mut qmin;
+            let mut min_index = (0, 0);
+            {
+                let qmin_shared = qmin_shared.read();
+                qmin = *qmin_shared;
+            }
+            // While let some tree
+            for i in indexes.iter() {
+                if let Some(tree) = &self.trees[*i] {
+                    for node in tree.iter() {
+                        let j = node.index;
+                        if (self.n_leaves as f64 - 2.0) * self.distance(*i, j)
+                            - self.sum_cols[*i].unwrap()
+                            - self.u_max
+                            >= qmin
+                        {
+                            break;
                         }
-                    }
-                    if qmin < *qmin_shared.read() {
-                        let mut qmin_write = qmin_shared.write();
-                        let mut min_index_write = min_index_shared.write();
-                        if qmin < *qmin_write {
-                            *qmin_write = qmin;
-                            *min_index_write = min_index;
+                        let q = (self.n_leaves as f64 - 2.0) * self.distance(*i, j)
+                            - self.sum_cols[*i].unwrap()
+                            - self.sum_cols[j].unwrap();
+                        if q < qmin {
+                            qmin = q;
+                            min_index = (*i, j);
                         }
                     }
                 }
-            });
+                if qmin < *qmin_shared.read() {
+                    let mut qmin_write = qmin_shared.write();
+                    let mut min_index_write = min_index_shared.write();
+                    if qmin < *qmin_write {
+                        *qmin_write = qmin;
+                        *min_index_write = min_index;
+                    }
+                }
+            }
+        });
         // Choose the minimum of the minima
         min_index_shared.into_inner()
     }
@@ -109,8 +107,10 @@ impl QMatrix {
         self.trees.push(Some(BTreeSet::new_in(std::alloc::Global)));
         self.distances.push(Some(Vec::with_capacity(self.n_leaves)));
 
-        self.indexes.push(self.n-1);
-        self.indexes.par_sort_unstable_by(|a, b| self.sum_cols[*b].partial_cmp(&self.sum_cols[*a]).unwrap());
+        self.indexes.push(self.n - 1);
+        self.indexes.par_sort_unstable_by(|a, b| {
+            self.sum_cols[*b].partial_cmp(&self.sum_cols[*a]).unwrap()
+        });
     }
 
     pub fn n_leaves(&self) -> usize {
@@ -165,7 +165,7 @@ impl From<&DistanceMatrix> for QMatrix {
             }
             trees.push(Some(tree));
         }
-        let mut indexes = (0..n).into_iter().collect::<Vec<usize>>();
+        let mut indexes = (0..n).collect::<Vec<usize>>();
         indexes.reserve_exact(n);
         indexes.par_sort_unstable_by(|a, b| sum_cols[*b].partial_cmp(&sum_cols[*a]).unwrap());
         // Sort according to sum_cols[i]
@@ -180,7 +180,6 @@ impl From<&DistanceMatrix> for QMatrix {
         }
     }
 }
-
 
 // Test QMatrix::from
 #[cfg(test)]
