@@ -32,23 +32,21 @@ fn test_random_additive_binary_trees_rapid() {
 
 #[test]
 fn test_random_additive_binary_trees_mix() {
+    use crate::algo::neighbor_joining;
     use crate::property_tests::random_additive_tree::{
         distance_matrix_from_tree, random_unrooted_binary_tree,
     };
-    use crate::algo::neighbor_joining;
     let original_tree = random_unrooted_binary_tree(20);
     let mut d: crate::distances::DistanceMatrix = distance_matrix_from_tree(original_tree.clone());
     d.permutate();
     for i in 20..30 {
         let original_tree = random_unrooted_binary_tree(i);
         let d: crate::distances::DistanceMatrix = distance_matrix_from_tree(original_tree.clone());
-        for _ in 0..5{
+        for _ in 0..5 {
             let random = rand::random::<usize>() % (i + 1);
             dbg!(random, i);
             let tree = neighbor_joining(d.clone(), random).unwrap();
             assert!(petgraph::algo::is_isomorphic(&original_tree, &tree));
-                
         }
     }
 }
-

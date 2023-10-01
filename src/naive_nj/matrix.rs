@@ -9,7 +9,7 @@ pub struct QMatrix {
 }
 
 impl QMatrix {
-    pub fn new (matrix: Vec<Vec<f64>>, sum_cols: Vec<f64>) -> Self {
+    pub fn new(matrix: Vec<Vec<f64>>, sum_cols: Vec<f64>) -> Self {
         Self { matrix, sum_cols }
     }
     pub fn n_leaves(&self) -> usize {

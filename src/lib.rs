@@ -1,9 +1,9 @@
 #![feature(allocator_api)]
 #![feature(btreemap_alloc)]
+pub mod algo;
 mod distances;
 mod naive_nj;
 mod newick;
-pub mod algo;
 pub mod property_tests;
 pub mod rapid_nj;
 
@@ -110,7 +110,7 @@ pub fn run(config: Config) {
         Algorithm::RapidNJ => rapid_nj(d),
         Algorithm::Hybrid => {
             let n = d.size();
-            neighbor_joining(d, n - n/5)
+            neighbor_joining(d, n - n / 5)
         }
     };
     let graph = d.unwrap_or_else(|err| {
