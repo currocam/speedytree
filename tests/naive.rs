@@ -14,7 +14,7 @@ fn wikipedia_example_naive() {
 
     let expected_output = "((c:4.0,(d:2.0,e:1.0):2.0):3.0,a:2.0,b:3.0);";
 
-    let mut child = Command::new("target/debug/birc-rapidnj")
+    let mut child = Command::new("target/debug/speedytree")
         .arg("--naive")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -51,7 +51,7 @@ fn simple_tree_naive() {
     let expected_output = "(((Gorilla:0.158225,(Chimp:0.1500999999999999,Human:0.1191000000000001):0.03552500000000003):0.03500000000000006,Orang:0.27664999999999997):0.05954999999999988,Mouse:1.1802124999999999,Gibbon:0.3429875000000002);";
     // Parse the output so only one decimal place is shown
 
-    let mut child = Command::new("target/debug/birc-rapidnj")
+    let mut child = Command::new("target/debug/speedytree")
         .arg("--naive")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())

@@ -14,7 +14,7 @@ fn wikipedia_example_hybrid() {
 
     let expected_output = "(((e:1.0,d:2.0):2.0,c:4.0):3.0,a:2.0,b:3.0);";
 
-    let mut child = Command::new("target/debug/birc-rapidnj")
+    let mut child = Command::new("target/debug/speedytree")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
@@ -48,7 +48,7 @@ fn simple_tree_hybrid() {
     Human     1.4629 0.5583 0.4710 0.3083 0.2692 0.0000
 ";
     let expected_output = "((((Chimp:0.15009999999999988,Human:0.11910000000000012):0.03552500000000003,Gorilla:0.158225):0.03500000000000006,Orang:0.27664999999999997):0.05954999999999988,Mouse:1.1802124999999999,Gibbon:0.3429875000000002);";
-    let mut child = Command::new("target/debug/birc-rapidnj")
+    let mut child = Command::new("target/debug/speedytree")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
