@@ -1,7 +1,12 @@
 #[cfg(test)]
+fn assert_equal_tree(a: &crate::Tree, b: &crate::Tree, i: usize) {
+    use crate::property_tests::tree_distances::{branch_score, robinson_foulds};
+    assert_eq!(robinson_foulds(a.clone(), b.clone(), i), 0);
+    assert!(petgraph::algo::is_isomorphic(&a.clone(), &b));
+    assert!(branch_score(a.clone(), b.clone(), i) < f64::EPSILON);
+}
 #[test]
 fn test_random_additive_binary_trees_naive() {
-    use crate::property_tests::robinson_foulds;
     use crate::{
         naive_nj::naive_neighbor_joining,
         property_tests::random_additive_tree::{
@@ -10,14 +15,9 @@ fn test_random_additive_binary_trees_naive() {
     };
     for i in 4..20 {
         let original_tree = random_unrooted_binary_tree(i);
-        let mut d = distance_matrix_from_tree(original_tree.clone());
-        d.permutate();
+        let d = distance_matrix_from_tree(original_tree.clone());
         let tree = naive_neighbor_joining(d).unwrap();
-        assert_eq!(
-            robinson_foulds::distance(original_tree.clone(), tree.clone()),
-            0
-        );
-        assert!(petgraph::algo::is_isomorphic(&original_tree.clone(), &tree));
+        assert_equal_tree(&original_tree, &tree, i)
     }
 }
 #[test]
@@ -25,18 +25,12 @@ fn test_random_additive_binary_trees_rapid() {
     use crate::property_tests::random_additive_tree::{
         distance_matrix_from_tree, random_unrooted_binary_tree,
     };
-    use crate::property_tests::robinson_foulds;
     use crate::rapid_nj::rapid_nj;
     for i in 4..20 {
         let original_tree = random_unrooted_binary_tree(i);
-        let mut d = distance_matrix_from_tree(original_tree.clone());
-        d.permutate();
+        let d = distance_matrix_from_tree(original_tree.clone());
         let tree = rapid_nj(d).unwrap();
-        assert_eq!(
-            robinson_foulds::distance(original_tree.clone(), tree.clone()),
-            0
-        );
-        assert!(petgraph::algo::is_isomorphic(&original_tree.clone(), &tree));
+        assert_equal_tree(&original_tree, &tree, i)
     }
 }
 
@@ -46,21 +40,17 @@ fn test_random_additive_binary_trees_mix() {
     use crate::property_tests::random_additive_tree::{
         distance_matrix_from_tree, random_unrooted_binary_tree,
     };
-    use crate::property_tests::robinson_foulds;
+
     let original_tree = random_unrooted_binary_tree(20);
     let mut d: crate::distances::DistanceMatrix = distance_matrix_from_tree(original_tree.clone());
     d.permutate();
-    for i in 20..30 {
+    for i in (25..100).step_by(25) {
         let original_tree = random_unrooted_binary_tree(i);
         let d: crate::distances::DistanceMatrix = distance_matrix_from_tree(original_tree.clone());
         for _ in 0..5 {
             let random = rand::random::<usize>() % (i + 1);
             let tree = neighbor_joining(d.clone(), random).unwrap();
-            assert_eq!(
-                robinson_foulds::distance(original_tree.clone(), tree.clone()),
-                0
-            );
-            assert!(petgraph::algo::is_isomorphic(&original_tree.clone(), &tree));
+            assert_equal_tree(&original_tree, &tree, i)
         }
     }
 }

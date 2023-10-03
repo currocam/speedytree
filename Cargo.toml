@@ -7,6 +7,8 @@ edition = "2021"
 
 [dependencies]
 bit-set = "0.5.3"
+bit-vec = "0.6.3"
+bitvec = "1.0.1"
 dtoa = "1.0.9"
 fixedbitset = "0.4.2"
 parking_lot = "0.12.1"
