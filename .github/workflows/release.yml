@@ -31,6 +31,8 @@ jobs:
       - uses: actions-rs/toolchain@v1
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
+          toolchain: nightly
+          override: true
           # (required)
           bin: speedytree
           # (optional) On which platform to distribute the `.tar.gz` file.
