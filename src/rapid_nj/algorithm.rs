@@ -2,8 +2,9 @@ use crate::{distances::DistanceMatrix, ResultBox, Tree};
 
 use super::{phylo_tree::PhyloTree, qmatrix::QMatrix};
 
-pub fn rapid_nj(dist: DistanceMatrix) -> ResultBox<Tree> {
+pub fn rapid_nj(dist: DistanceMatrix, chunk_size: usize) -> ResultBox<Tree> {
     let mut q = QMatrix::from(&dist);
+    q.set_chunk_size(chunk_size);
     let mut t = PhyloTree::build(&dist.names);
     while q.n_leaves() > 3 {
         // Find the minimum element in the distance matrix

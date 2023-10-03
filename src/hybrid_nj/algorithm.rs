@@ -13,15 +13,20 @@ use crate::{
 /// Returns:
 /// * `Ok(Tree)` - A phylogenetic tree
 /// * `Err(Box<dyn error::Error>)` - An error
-pub fn neighbor_joining(dist: DistanceMatrix, naive_iters: usize) -> ResultBox<Tree> {
+pub fn neighbor_joining(
+    dist: DistanceMatrix,
+    naive_iters: usize,
+    chunk_size: usize,
+) -> ResultBox<Tree> {
     if dist.size() < 4 || naive_iters >= dist.size() {
         return crate::naive_neighbor_joining(dist);
     }
     if naive_iters < 4 {
-        return crate::rapid_nj(dist);
+        return crate::rapid_nj(dist, chunk_size);
     }
     let mut q = crate::rapid_nj::QMatrix::from(&dist);
     let mut t = crate::rapid_nj::PhyloTree::build(&dist.names);
+    q.set_chunk_size(chunk_size);
     while q.n_leaves() > naive_iters {
         let (i, j) = q.find_neighbors();
         let (dist_ui, dist_uj) = q.new_node_distances(i, j);

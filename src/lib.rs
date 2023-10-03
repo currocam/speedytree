@@ -42,7 +42,7 @@ type ResultBox<T> = std::result::Result<T, Box<dyn error::Error>>;
 type Tree = petgraph::graph::UnGraph<String, f64>;
 
 /// Available algorithms in the program
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Algorithm {
     /// Naive neighbor joining
     Naive,
@@ -66,10 +66,11 @@ pub fn run(config: configuration::Config) {
 
     let d = match config.algo {
         Algorithm::Naive => naive_neighbor_joining(d),
-        Algorithm::RapidNJ => rapid_nj(d),
+        Algorithm::RapidNJ => rapid_nj(d, config.chunk_size),
         Algorithm::Hybrid => {
-            let n = d.size();
-            neighbor_joining(d, n - n / 5)
+            let naive_steps = d.size() * config.naive_percentage / 100;
+            dbg!(naive_steps);
+            neighbor_joining(d, naive_steps, config.chunk_size)
         }
     };
     let graph = d.unwrap_or_else(|err| {

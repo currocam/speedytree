@@ -29,7 +29,8 @@ fn test_random_additive_binary_trees_rapid() {
     for i in 4..20 {
         let original_tree = random_unrooted_binary_tree(i);
         let d = distance_matrix_from_tree(original_tree.clone());
-        let tree = rapid_nj(d).unwrap();
+        let chunk_size = rand::random::<usize>() % (i + 1) + 1;
+        let tree = rapid_nj(d, chunk_size).unwrap();
         assert_equal_tree(&original_tree, &tree, i)
     }
 }
@@ -48,8 +49,9 @@ fn test_random_additive_binary_trees_mix() {
         let original_tree = random_unrooted_binary_tree(i);
         let d: crate::distances::DistanceMatrix = distance_matrix_from_tree(original_tree.clone());
         for _ in 0..5 {
-            let random = rand::random::<usize>() % (i + 1);
-            let tree = neighbor_joining(d.clone(), random).unwrap();
+            let naive_steps = rand::random::<usize>() % (i + 1);
+            let chunk_size = rand::random::<usize>() % (i + 1) + 1;
+            let tree = neighbor_joining(d.clone(), naive_steps, chunk_size).unwrap();
             assert_equal_tree(&original_tree, &tree, i)
         }
     }

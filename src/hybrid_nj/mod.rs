@@ -10,7 +10,7 @@ mod tests {
     #[test]
     fn test_example_wikipedia() {
         let d = DistanceMatrix::wikipedia_example();
-        let phylo = neighbor_joining(d, 4);
+        let phylo = neighbor_joining(d, 4, 1);
         assert!(phylo.is_ok());
         let tree = phylo.unwrap();
         let mut node_indices = tree.node_indices();

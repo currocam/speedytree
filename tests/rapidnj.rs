@@ -15,7 +15,7 @@ fn wikipedia_example_rapid() {
     let expected_output = "((c:4.0,(d:2.0,e:1.0):2.0):3.0,a:2.0,b:3.0);";
 
     let mut child = Command::new("target/debug/speedytree")
-        .arg("--rapid")
+        .arg("--rapidnj")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
@@ -52,7 +52,7 @@ fn simple_tree_rapidnj() {
     // Parse the output so only one decimal place is shown
 
     let mut child = Command::new("target/debug/speedytree")
-        .arg("--rapid")
+        .arg("--rapidnj")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()

@@ -13,6 +13,7 @@ pub struct QMatrix {
     u_max: f64,
     n: usize,
     n_leaves: usize,
+    chunk_size: usize,
 }
 
 impl QMatrix {
@@ -31,7 +32,7 @@ impl QMatrix {
         // Create slices of the self.trees
         let qmin_shared = RwLock::new(f64::INFINITY); // Shared q_min
         let min_index_shared = RwLock::new((0, 0)); // Shared min_index
-        let chunk_size = 30;
+        let chunk_size = self.chunk_size;
         self.indexes.par_chunks(chunk_size).for_each(|indexes| {
             let mut qmin;
             let mut min_index = (0, 0);
@@ -132,6 +133,10 @@ impl QMatrix {
         }
         unmerged
     }
+
+    pub fn set_chunk_size(&mut self, chunk_size: usize) {
+        self.chunk_size = chunk_size;
+    }
 }
 
 // Implement from DistanceMatrix
@@ -168,7 +173,8 @@ impl From<&DistanceMatrix> for QMatrix {
         let mut indexes = (0..n).collect::<Vec<usize>>();
         indexes.reserve_exact(n);
         indexes.par_sort_unstable_by(|a, b| sum_cols[*b].partial_cmp(&sum_cols[*a]).unwrap());
-        // Sort according to sum_cols[i]
+
+        let chunk_size = 1;
         QMatrix {
             distances,
             sum_cols,
@@ -177,6 +183,7 @@ impl From<&DistanceMatrix> for QMatrix {
             u_max,
             n,
             n_leaves,
+            chunk_size,
         }
     }
 }
