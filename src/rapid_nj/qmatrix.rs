@@ -30,8 +30,25 @@ impl QMatrix {
 
     pub fn find_neighbors(&self) -> (usize, usize) {
         // Create slices of the self.trees
-        let qmin_shared = RwLock::new(f64::INFINITY); // Shared q_min
-        let min_index_shared = RwLock::new((0, 0)); // Shared min_index
+        let mut qmin_shared = f64::INFINITY; // Shared q_min
+        let mut min_index_shared = (0, 0); // Shared min_index
+                                           //  first entry in each row can be searched for a good minimu
+        self.indexes.iter().for_each(|i| {
+            if let Some(tree) = &self.trees[*i] {
+                if let Some(first) = tree.first() {
+                    let j = first.index;
+                    let q = (self.n_leaves as f64 - 2.0) * self.distance(*i, j)
+                        - self.sum_cols[*i].unwrap()
+                        - self.sum_cols[j].unwrap();
+                    if q < qmin_shared {
+                        qmin_shared = q;
+                        min_index_shared = (*i, j);
+                    }
+                }
+            }
+        });
+        let qmin_shared = RwLock::new(qmin_shared);
+        let min_index_shared = RwLock::new(min_index_shared);
         let chunk_size = self.chunk_size;
         self.indexes.par_chunks(chunk_size).for_each(|indexes| {
             let mut qmin;
