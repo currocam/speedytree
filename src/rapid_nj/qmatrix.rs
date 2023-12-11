@@ -291,7 +291,7 @@ mod tests {
     }
 
     fn wikipedia_distance_matrix() -> DistanceMatrix {
-        let d = DistanceMatrix {
+        DistanceMatrix {
             matrix: vec![
                 vec![0.0, 5.0, 9.0, 9.0, 8.0],
                 vec![5.0, 0.0, 10.0, 10.0, 9.0],
@@ -306,7 +306,6 @@ mod tests {
                 "D".to_string(),
                 "E".to_string(),
             ],
-        };
-        d
+        }
     }
 }

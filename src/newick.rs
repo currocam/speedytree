@@ -15,7 +15,6 @@ fn format_edge_float<'a>(
 }
 
 pub fn to_newick(t: &Tree) -> String {
-    // Find a node with 3 children
     let mut buffer = dtoa::Buffer::new();
     let root = root(t).unwrap();
     let mut visited = FixedBitSet::with_capacity(t.node_count());
@@ -91,7 +90,7 @@ mod tests {
         let c = graph.add_node("C".to_string());
         let internal = graph.add_node("".to_string());
         // Extend the graph
-        graph.extend_with_edges(&[
+        graph.extend_with_edges([
             (a, internal, 100.1),
             (b, internal, 20.2),
             (c, internal, 77757.1),
@@ -109,7 +108,7 @@ mod tests {
         let internal_v: NodeIndex = graph.add_node("".to_string());
         let internal_u: NodeIndex = graph.add_node("".to_string());
         // Extend the graph
-        graph.extend_with_edges(&[
+        graph.extend_with_edges([
             (a, internal_u, 0.1),
             (b, internal_u, 0.2),
             (c, internal_v, 0.3),

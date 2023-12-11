@@ -87,7 +87,7 @@ mod tests {
             // Count number of non "" nodes
             let mut n = 0;
             for node in tree.node_indices() {
-                if tree[node] != "" {
+                if !tree[node].is_empty() {
                     n += 1;
                 }
             }
@@ -104,7 +104,7 @@ mod tests {
             // Count number of non "" nodes
             let mut n = 0;
             for node in tree.node_indices() {
-                if tree[node] != "" {
+                if !tree[node].is_empty() {
                     n += 1;
                 }
             }
@@ -112,7 +112,7 @@ mod tests {
             assert_eq!(tree.node_count(), 2 * n_leaves - 2);
             // Assert any leave has degree 1 and any other node has degree 3
             for node in tree.node_indices() {
-                if tree[node] != "" {
+                if !tree[node].is_empty() {
                     assert_eq!(tree.edges(node).count(), 1);
                 } else {
                     assert_eq!(tree.edges(node).count(), 3);

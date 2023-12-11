@@ -114,7 +114,6 @@ mod tests {
     #[test]
     fn test_distance() {
         let names: Vec<String> = (0..4)
-            .into_iter()
             .map(|_| Alphanumeric.sample_string(&mut rand::thread_rng(), 16))
             .collect();
         let mut t1 = Tree::new_undirected();

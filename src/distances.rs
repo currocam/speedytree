@@ -95,7 +95,7 @@ D 9.0 10.0 8.0 0.0
 "
         .as_bytes();
         // run function
-        let distance_matrix = DistanceMatrix::build_from_phylip::<&[u8]>(&input[..]).unwrap();
+        let distance_matrix = DistanceMatrix::build_from_phylip::<&[u8]>(input).unwrap();
         // check result
         assert_eq!(
             distance_matrix.matrix,
