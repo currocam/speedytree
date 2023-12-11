@@ -1,6 +1,6 @@
 ## speedytree
 
-Speedytree is a program for building phylogenetic trees from large Phylip distance matrices. It is written in Rust and is open source. I wrote it as part of my MSc. in Bioinformatics at the University of Aarhus.
+Speedytree is a program for building phylogenetic trees from large Phylip distance matrices. I wrote it as part of my MSc. in Bioinformatics at the University of Aarhus. It implements the canonical algorithm, as well as the RapidNJ heuristic. 
 
 ### Installation
 You can either download the binary from the releases page or build it yourself. To build it yourself you need to have nightly Rust installed. Then you can run `cargo build --release` to build the binary. The binary will be located in `target/release/speedytree`.
@@ -17,11 +17,7 @@ Speedytree has a few options that can be used to tweak the output. You can see t
 - `-c` to set the number of threads to use. By default it will use 1.
 - `--naive` to set use the naive implementation. This algorithm is equivalent to QuickTree, and it's fast in practice for small matrices. 
 - `--rapidnj` to set use the RapidNJ heuristics, but implemented with BTrees. 
-- `--hybrid` to set use a mix of the two algorithms. This is the default, as it's the fastest in practice for large matrices.
-
-### Performance
-
-Todo: Add performance numbers.
+- `--hybrid` to set use a mix of the two algorithms.
 
 ### Testing
 
@@ -29,8 +25,4 @@ Speedytree has a test suite that can be run with `cargo test`. There are three t
 
 - Unit tests, which test individual functions.
 - Integration tests, which test the whole program with small matrices.
-- Property tests, which test the program with randomly additive binary trees. This tests relies in the fact that the program should output the same tree that it was given as input.
-
-### License
-
-Speedytree is licensed under the MIT license. See the LICENSE file for details.
+- Property-based tests, which test the program with randomly additive binary trees. This tests relies in the fact that the program should output the same tree that it was given as input.
