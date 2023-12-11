@@ -21,7 +21,7 @@ Speedytree has a few options that can be used to tweak the output. You can see t
 
 ### Benchmark
 
-You can run the benchmark with `make benchmark`. As an example, a small sth file is included, but you probably want to add your own. 
+You can run the benchmark with `make benchmark`. As an example, a small sth file is included, but you probably want to add your own. The alignments I used are included in the release with the binary executable file. 
 
 ### Testing
 
