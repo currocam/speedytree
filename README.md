@@ -19,6 +19,10 @@ Speedytree has a few options that can be used to tweak the output. You can see t
 - `--rapidnj` to set use the RapidNJ heuristics, but implemented with BTrees. 
 - `--hybrid` to set use a mix of the two algorithms.
 
+### Benchmark
+
+You can run the benchmark with `make benchmark`. As an example, a small sth file is included, but you probably want to add your own. 
+
 ### Testing
 
 Speedytree has a test suite that can be run with `cargo test`. There are three types of tests:
