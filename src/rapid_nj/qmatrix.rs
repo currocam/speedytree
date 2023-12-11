@@ -38,8 +38,8 @@ impl QMatrix {
                 if let Some(first) = tree.first() {
                     let j = first.index;
                     let q = (self.n_leaves as f64 - 2.0) * self.distance(*i, j)
-                        - self.sum_cols[*i].unwrap()
-                        - self.sum_cols[j].unwrap();
+                        - self.sum_cols[*i].expect("Valid index")
+                        - self.sum_cols[j].expect("Valid index");
                     if q < qmin_shared {
                         qmin_shared = q;
                         min_index_shared = (*i, j);
@@ -63,15 +63,15 @@ impl QMatrix {
                     for node in tree.iter() {
                         let j = node.index;
                         if (self.n_leaves as f64 - 2.0) * self.distance(*i, j)
-                            - self.sum_cols[*i].unwrap()
+                            - self.sum_cols[*i].expect("Valid index")
                             - self.u_max
                             >= qmin
                         {
                             break;
                         }
                         let q = (self.n_leaves as f64 - 2.0) * self.distance(*i, j)
-                            - self.sum_cols[*i].unwrap()
-                            - self.sum_cols[j].unwrap();
+                            - self.sum_cols[*i].expect("Valid index")
+                            - self.sum_cols[j].expect("Valid index");
                         if q < qmin {
                             qmin = q;
                             min_index = (*i, j);
@@ -114,8 +114,10 @@ impl QMatrix {
                     - Self::distances_vec(distances, i, j));
             row.insert(Node::new(self.n, new_distance));
 
-            self.sum_cols[m] = Some(self.sum_cols[m].unwrap() - dim - djm + new_distance);
-            self.sum_cols[self.n] = Some(self.sum_cols[self.n].unwrap() + new_distance);
+            self.sum_cols[m] =
+                Some(self.sum_cols[m].expect("Valid index") - dim - djm + new_distance);
+            self.sum_cols[self.n] =
+                Some(self.sum_cols[self.n].expect("Valid index") + new_distance);
             distances[m].as_mut().unwrap().push(new_distance);
         }
         self.n_leaves -= 1;
@@ -136,8 +138,8 @@ impl QMatrix {
     }
     pub fn new_node_distances(&self, i: usize, j: usize) -> (f64, f64) {
         let s = (self.n_leaves() - 2) as f64;
-        let dist_ui =
-            self.distance(i, j) + self.sum_cols[i].unwrap() / s - self.sum_cols[j].unwrap() / s;
+        let dist_ui = self.distance(i, j) + self.sum_cols[i].expect("Valid index") / s
+            - self.sum_cols[j].expect("Valid index") / s;
         (dist_ui / 2.0, self.distance(i, j) - dist_ui / 2.0)
     }
     pub fn unmerged_nodes(&self) -> Vec<usize> {

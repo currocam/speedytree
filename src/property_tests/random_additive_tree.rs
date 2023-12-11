@@ -39,10 +39,10 @@ pub fn random_unrooted_binary_tree(n_leaves: usize) -> UnGraph<String, f64> {
     let root = t
         .node_indices()
         .find(|node| t.edges(*node).count() == 2)
-        .unwrap();
+        .expect("Valid rooted binary tree");
     let mut neighbors = t.neighbors_undirected(root);
-    let a = neighbors.next().unwrap();
-    let b = neighbors.next().unwrap();
+    let a = neighbors.next().expect("Enough leaves");
+    let b = neighbors.next().expect("Enough leaves");
     t.remove_node(root);
     // Add edge between a and b
     let mut rng = rand::thread_rng();
@@ -64,7 +64,7 @@ pub fn distance_matrix_from_tree(t: Tree) -> DistanceMatrix {
         for (j, b) in leaves.iter().enumerate() {
             mat[i][j] =
                 petgraph::algo::astar(&t, *a, |finish| finish == *b, |e| *e.weight(), |_| 0.0)
-                    .unwrap()
+                    .expect("All nodes are connected")
                     .0;
         }
     }

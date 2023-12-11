@@ -41,11 +41,11 @@ impl PhyloTree {
     pub fn merge_neighbors(&mut self, a: usize, b: usize, dau: f64, dbu: f64) -> NodeIndex {
         // Get nodes to merge
         let n: &usize = &self.n_unmerged_leaves;
-        let a_node = self.nodes.remove(&a).unwrap();
-        let b_node = self.nodes.remove(&b).unwrap();
+        let a_node = self.nodes.remove(&a).expect("Valid node");
+        let b_node = self.nodes.remove(&b).expect("Valid node");
         // Swap nodes according to nj algorithm
         if b == n - 2 {
-            let new_a = self.nodes.remove(&(n - 1)).unwrap();
+            let new_a = self.nodes.remove(&(n - 1)).expect("Valid node");
             self.nodes.insert(a, new_a);
         } else {
             let new_a = self.nodes.remove(&(n - 2));

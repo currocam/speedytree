@@ -27,10 +27,10 @@ impl DistanceMatrix {
             line.clear();
             reader.read_line(&mut line)?;
             let mut words = line.split_whitespace();
-            names.push(words.next().unwrap().to_string());
+            names.push(words.next().expect("Valid Phylip format").to_string());
             matrix.push(
                 words
-                    .map(|s| s.parse::<f64>().unwrap())
+                    .map(|s| s.parse::<f64>().expect("Valid Phylip format"))
                     .collect::<Vec<f64>>(),
             );
         }

@@ -9,14 +9,14 @@ fn format_edge_float<'a>(
     parent: NodeIndex,
     buffer: &'a mut dtoa::Buffer,
 ) -> &'a str {
-    let e: petgraph::stable_graph::EdgeIndex = t.find_edge(node, parent).unwrap();
+    let e: petgraph::stable_graph::EdgeIndex = t.find_edge(node, parent).expect("Valid edge");
     // Stop using format! for performance, create a string directly
-    buffer.format_finite(*t.edge_weight(e).unwrap())
+    buffer.format_finite(*t.edge_weight(e).expect("Valid edge"))
 }
 
 pub fn to_newick(t: &Tree) -> String {
     let mut buffer = dtoa::Buffer::new();
-    let root = root(t).unwrap();
+    let root = root(t).expect("Node with three edges");
     let mut visited = FixedBitSet::with_capacity(t.node_count());
     fn inner(
         t: &Tree,

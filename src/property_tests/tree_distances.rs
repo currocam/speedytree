@@ -74,7 +74,7 @@ fn collect_bit_vector(
         }
     });
     let mut left_nodes = HashSet::new();
-    let (parent_left, parent_right) = tree.edge_endpoints(edge).unwrap();
+    let (parent_left, parent_right) = tree.edge_endpoints(edge).expect("Valid edge");
     let mut left_queue = Vec::new();
     left_nodes.insert(parent_left);
     tree.neighbors(parent_left)
