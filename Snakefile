@@ -2,8 +2,13 @@ import random
 import pandas as pd
 import numpy as np
 
-DATA_DIR = "pfam_alignments"
-(SAMPLE,) = glob_wildcards(f"{DATA_DIR}/{{sample}}.sth")
+DATA_DIR = "data"
+(SAMPLES,) = glob_wildcards(f"{DATA_DIR}/{{sample}}.sth")
+
+if not SAMPLES:
+    raise ValueError(
+        f"Data directory {DATA_DIR} is missing or do not contain any .sth files"
+    )
 
 
 rule all:
@@ -11,14 +16,14 @@ rule all:
         expand(
             "benchmarks/speedytree/{sample}{seed}_{algo}_{threads}.txt",
             algo=["naive", "rapidnj", "hybrid"],
-            sample=SAMPLE,
+            sample=SAMPLES,
             seed=["", "_seed_1", "_seed_2"],
             threads=[1, 8],
         ),
         expand(
             "benchmarks/{program}/{sample}{seed}.txt",
             program=["rapidnj", "quicktree"],
-            sample=SAMPLE,
+            sample=SAMPLES,
             seed=["", "_seed_1", "_seed_2"],
         ),
 
