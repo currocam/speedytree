@@ -2,7 +2,6 @@ use crate::{
     distances::DistanceMatrix, naive_nj::DataNaiveNJ, rapid_nj::DataRapidNJ, ResultBox, Tree,
 };
 
-/// Main function of the crate
 /// This approach is a hybrid between the naive neighbor joining and the rapid neighbor joining.
 /// If `naive_iters` is greater than n, then this function calls `naive_neighbor_joining` instead.
 /// If `naive_iters` is less than 4, then this function calls `rapid_nj` instead.
@@ -19,10 +18,10 @@ pub fn neighbor_joining(
     chunk_size: usize,
 ) -> ResultBox<Tree> {
     if dist.size() < 4 || naive_iters >= dist.size() {
-        return crate::naive_neighbor_joining(dist);
+        return crate::naive_nj::canonical_neighbor_joining(dist);
     }
     if naive_iters < 4 {
-        return crate::rapid_nj(dist, chunk_size);
+        return crate::rapid_nj::rapid_nj(dist, chunk_size);
     }
     let mut q = crate::rapid_nj::QMatrix::from(&dist);
     let mut t = crate::rapid_nj::PhyloTree::build(&dist.names);

@@ -3,14 +3,14 @@ use std::collections::HashMap;
 use petgraph::{graph::UnGraph, stable_graph::NodeIndex};
 
 #[derive(Debug, Clone)]
-pub struct PhyloTree {
+pub(crate) struct PhyloTree {
     pub tree: crate::Tree,
     pub nodes: HashMap<usize, NodeIndex>,
     n_nodes: usize,
 }
 
 impl PhyloTree {
-    pub fn build(leafs: &Vec<String>) -> PhyloTree {
+    pub fn build(leafs: &[String]) -> PhyloTree {
         let mut tree: petgraph::Graph<String, f64, petgraph::Undirected> =
             UnGraph::new_undirected();
         let mut nodes = HashMap::new();

@@ -1,3 +1,4 @@
+extern crate speedytree; 
 use clap::Parser;
 /// # speedytree
 /// `speedytree` is a command line tool for quickly creating a directory tree.
@@ -9,7 +10,7 @@ use hybrid_nj::neighbor_joining;
 use speedytree::hybrid_nj;
 
 use speedytree::distances::DistanceMatrix;
-use speedytree::naive_nj::naive_neighbor_joining;
+use speedytree::naive_nj::canonical_neighbor_joining;
 use speedytree::newick::to_newick;
 use speedytree::rapid_nj::rapid_nj;
 use std::{
@@ -117,13 +118,13 @@ pub fn run(config: Config) {
         .unwrap();
 
     let reader = io::stdin().lock();
-    let d = DistanceMatrix::build_from_phylip(reader).unwrap_or_else(|err| {
+    let d = DistanceMatrix::read_from_phylip(reader).unwrap_or_else(|err| {
         eprintln!("{err}");
         process::exit(1);
     });
 
     let d = match config.algo {
-        Algorithm::Naive => naive_neighbor_joining(d),
+        Algorithm::Naive => canonical_neighbor_joining(d),
         Algorithm::RapidNJ => rapid_nj(d, config.chunk_size),
         Algorithm::Hybrid => {
             let naive_steps = d.size() * config.naive_percentage / 100;

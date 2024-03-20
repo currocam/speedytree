@@ -13,7 +13,7 @@ pub struct DistanceMatrix {
 
 /// Distance matrix from a phylip file
 impl DistanceMatrix {
-    pub fn build_from_phylip<R>(mut reader: R) -> ResultBox<DistanceMatrix>
+    pub fn read_from_phylip<R>(mut reader: R) -> ResultBox<DistanceMatrix>
     where
         R: io::BufRead,
     {
@@ -41,7 +41,7 @@ impl DistanceMatrix {
         self.matrix.len()
     }
     /// Permutate the distance matrix for testing purposes
-    pub fn permutate(&mut self) {
+    pub(crate) fn permutate(&mut self) {
         let mut rng = rand::thread_rng();
         let mut perm = (0..self.size()).collect::<Vec<usize>>();
         perm.shuffle(&mut rng);
@@ -59,7 +59,7 @@ impl DistanceMatrix {
         self.names = new_names;
     }
     /// Example from Wikipedia, https://en.wikipedia.org/wiki/Neighbor_joining
-    pub fn wikipedia_example() -> DistanceMatrix {
+    pub(crate) fn wikipedia_example() -> DistanceMatrix {
         DistanceMatrix {
             matrix: vec![
                 vec![0.0, 5.0, 9.0, 9.0, 8.0],
@@ -95,7 +95,7 @@ D 9.0 10.0 8.0 0.0
 "
         .as_bytes();
         // run function
-        let distance_matrix = DistanceMatrix::build_from_phylip::<&[u8]>(input).unwrap();
+        let distance_matrix = DistanceMatrix::read_from_phylip::<&[u8]>(input).unwrap();
         // check result
         assert_eq!(
             distance_matrix.matrix,

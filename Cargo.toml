@@ -12,6 +12,7 @@ path = "src/lib.rs"
 name = "speedytree"
 path = "src/bin.rs"
 [dependencies]
+anyhow = "1.0.81"
 bit-set = "0.5.3"
 bit-vec = "0.6.3"
 bitvec = "1.0.1"

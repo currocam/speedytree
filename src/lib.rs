@@ -1,41 +1,41 @@
-//! speedytree: Command line tool for Neighbor Joining of biological sequences
+//! Canonical and RapidNJ implementations of Neighbor-joining in Rust
 //!
-//! It implements different heuristics for fast Neighbor-Joining.
-//!
-//!   1. Naive Neighbor-Joining
-//!   2. RapidNJ
-//!   3. Hybrid
-//!
+//! Provides Rust implementation of the Canonical algorithm and something in the spirit of RapidNJ but with B-trees. Work in progress.
+//! A minimal example is provided here. 
+//! ```
+//! use speedytree::distances::DistanceMatrix;
+//! use speedytree::canonical_neighbor_joining;
+//! use speedytree::rapid_nj_neighbor_joining;
+//! use speedytree::robinson_foulds;
+//!// Raw Phylip format
+//!let input = "5
+//!    a	0	5	9	9	8
+//!    b	5	0	10	10	9
+//!    c	9	10	0	8	7
+//!    d	9	10	8	0	3
+//!    e	8	9	7	3	0
+//!".as_bytes();;
+//!let distances = DistanceMatrix::read_from_phylip(input).unwrap();
+//! // Use canonical algorithm
+//!let tree1 = canonical_neighbor_joining(distances.clone()).unwrap();
+//! // Use RapidNJ with b-trees-
+//!let tree2 = rapid_nj_neighbor_joining(distances.clone(), 2).unwrap();
+//! assert_eq!(robinson_foulds(tree1, tree2, 5), 0);
+//! ```
 
-#![warn(missing_docs)]
-/// Hybrid neighbor joining algorithm
-/// This approach is a hybrid between the naive neighbor joining and the rapid neighbor joining.
-/// The idea is to use the rapidnj heuristic first to potentially stop the algorithm early,
-/// and then use the naive neighbor joining to finish the algorithm, which is faster
-/// in practice, but performs more comparisons in theory.
-/// However, both algorithms are O(n^3), so the difference is not that big.
 pub mod hybrid_nj;
 /// Property tests for neighbor joining algorithm
 pub mod property_tests;
-
-/// Configuration of the program
-pub mod configuration;
 pub mod distances;
 pub mod naive_nj;
 pub mod newick;
 pub mod rapid_nj;
-use hybrid_nj::neighbor_joining;
-
-use crate::distances::DistanceMatrix;
-use crate::naive_nj::naive_neighbor_joining;
-use crate::newick::to_newick;
-use crate::rapid_nj::rapid_nj;
-use std::{
-    error,
-    io::{self, Write},
-    process,
-};
+use std::error;
 
 type ResultBox<T> = std::result::Result<T, Box<dyn error::Error>>;
 type Tree = petgraph::graph::UnGraph<String, f64>;
 
+pub use naive_nj::canonical_neighbor_joining as canonical_neighbor_joining;
+pub use rapid_nj::rapid_nj as rapid_nj_neighbor_joining;
+pub use property_tests::tree_distances::robinson_foulds as robinson_foulds;
+pub use property_tests::tree_distances::branch_score as branch_score;
