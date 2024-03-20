@@ -124,7 +124,7 @@ impl QMatrix {
         self.n += 1;
         self.distances[i] = None;
         self.distances[j] = None;
-        self.trees.push(Some(BTreeSet::new_in(std::alloc::Global)));
+        self.trees.push(Some(BTreeSet::new()));
         self.distances.push(Some(Vec::with_capacity(self.n_leaves)));
 
         self.indexes.push(self.n - 1);

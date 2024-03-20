@@ -7,8 +7,6 @@
 //!   3. Hybrid
 //!
 
-#![feature(allocator_api)]
-#![feature(btreemap_alloc)]
 #![warn(missing_docs)]
 /// Hybrid neighbor joining algorithm
 /// This approach is a hybrid between the naive neighbor joining and the rapid neighbor joining.
