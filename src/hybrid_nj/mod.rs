@@ -4,8 +4,8 @@ pub use algorithm::neighbor_joining;
 
 #[cfg(test)]
 mod tests {
-    use crate::distances::DistanceMatrix;
     use super::*;
+    use crate::distances::DistanceMatrix;
     #[test]
     fn test_example_wikipedia() {
         let d = DistanceMatrix {

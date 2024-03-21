@@ -1,4 +1,4 @@
-extern crate speedytree; 
+extern crate speedytree;
 use clap::Parser;
 /// # speedytree
 /// `speedytree` is a command line tool for quickly creating a directory tree.
@@ -19,8 +19,6 @@ use std::{
     process,
 };
 type ResultBox<T> = std::result::Result<T, Box<dyn error::Error>>;
-
-
 
 /// Define the configuration of the program
 /// It contains the algorithm to use and the number of threads to use

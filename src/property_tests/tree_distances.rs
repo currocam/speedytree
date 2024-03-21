@@ -18,7 +18,7 @@ fn count_leaves(x: &Tree) -> usize {
 
 /// Calculate the Branch-Score distance between two trees
 pub fn branch_score(a: &Tree, b: &Tree) -> f64 {
-    let n_leaves = (count_leaves(&a), count_leaves(&b)); 
+    let n_leaves = (count_leaves(a), count_leaves(b));
     assert_eq!(n_leaves.0, n_leaves.1);
     let n_leaves = n_leaves.0;
     let mut bits_a = HashMap::new();
@@ -26,12 +26,12 @@ pub fn branch_score(a: &Tree, b: &Tree) -> f64 {
     a.edge_indices()
         .zip(a.edge_weights())
         .for_each(|(edge, w)| {
-            bits_a.insert(collect_bit_vector(&a, edge, n_leaves), *w);
+            bits_a.insert(collect_bit_vector(a, edge, n_leaves), *w);
         });
     b.edge_indices()
         .zip(b.edge_weights())
         .for_each(|(edge, w)| {
-            bits_b.insert(collect_bit_vector(&b, edge, n_leaves), *w);
+            bits_b.insert(collect_bit_vector(b, edge, n_leaves), *w);
         });
 
     // Get union of a and b keys
@@ -50,19 +50,18 @@ pub fn branch_score(a: &Tree, b: &Tree) -> f64 {
     distance
 }
 
-
 /// Calculate the Robinson-Foulds distance between two trees
 pub fn robinson_foulds(a: &Tree, b: &Tree) -> usize {
-    let n_leaves = (count_leaves(&a), count_leaves(&b)); 
+    let n_leaves = (count_leaves(a), count_leaves(b));
     assert_eq!(n_leaves.0, n_leaves.1);
     let n_leaves = n_leaves.0;
     let bits_a: HashSet<BitVec> = HashSet::from_iter(
         a.edge_indices()
-            .map(|edge| collect_bit_vector(&a, edge, n_leaves)),
+            .map(|edge| collect_bit_vector(a, edge, n_leaves)),
     );
     let bits_b: HashSet<BitVec> = HashSet::from_iter(
         b.edge_indices()
-            .map(|edge| collect_bit_vector(&b, edge, n_leaves)),
+            .map(|edge| collect_bit_vector(b, edge, n_leaves)),
     );
 
     let mut distance = 0;

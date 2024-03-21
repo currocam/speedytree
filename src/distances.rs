@@ -38,7 +38,7 @@ impl DistanceMatrix {
     pub fn size(&self) -> usize {
         self.matrix.len()
     }
-    pub fn build(matrix: Vec<Vec<f64>>, names: Vec<String>) -> ResultBox<DistanceMatrix>{
+    pub fn build(matrix: Vec<Vec<f64>>, names: Vec<String>) -> ResultBox<DistanceMatrix> {
         if matrix.len() != names.len() {
             return Err("Matrix and names have different lengths".into());
         }
