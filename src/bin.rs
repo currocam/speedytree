@@ -6,13 +6,9 @@ use clap::Parser;
 /// It is intended to be a drop-in replacement for the `tree` command.
 /// It is not intended to be a complete implementation of the `tree` command.
 /// It is intended to be a fast implementation of the `tree` command.
-use hybrid_nj::neighbor_joining;
-use speedytree::hybrid_nj;
+use speedytree::DistanceMatrix;
+use speedytree::{Canonical, Hybrid, NeighborJoiningSolver, RapidBtrees};
 
-use speedytree::distances::DistanceMatrix;
-use speedytree::naive_nj::canonical_neighbor_joining;
-use speedytree::newick::to_newick;
-use speedytree::rapid_nj::rapid_nj;
 use std::{
     error,
     io::{self, Write},
@@ -122,12 +118,13 @@ pub fn run(config: Config) {
     });
 
     let d = match config.algo {
-        Algorithm::Naive => canonical_neighbor_joining(d),
-        Algorithm::RapidNJ => rapid_nj(d, config.chunk_size),
+        Algorithm::Naive => NeighborJoiningSolver::<Canonical>::default(d).solve(),
+        Algorithm::RapidNJ => {
+            NeighborJoiningSolver::<RapidBtrees>::build(d, config.chunk_size).solve()
+        }
         Algorithm::Hybrid => {
             let naive_steps = d.size() * config.naive_percentage / 100;
-            dbg!(naive_steps);
-            neighbor_joining(d, naive_steps, config.chunk_size)
+            NeighborJoiningSolver::<Hybrid>::build(d, config.chunk_size, naive_steps).solve()
         }
     };
     let graph = d.unwrap_or_else(|err| {
@@ -135,7 +132,7 @@ pub fn run(config: Config) {
         process::exit(1);
     });
     io::stdout()
-        .write_all(to_newick(&graph).as_bytes())
+        .write_all(speedytree::to_newick(&graph).as_bytes())
         .unwrap_or_else(|err| {
             eprintln!("{err}");
             process::exit(1);

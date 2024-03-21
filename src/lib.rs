@@ -1,7 +1,9 @@
 //! Canonical and RapidNJ implementations of Neighbor-joining in Rust
 //!
-//! Provides Rust implementation of the Canonical algorithm and something in the spirit of RapidNJ but with B-trees. Work in progress.
-//! A minimal example is provided here.
+//! Provides Rust implementation of the Canonical algorithm and something in the spirit of RapidNJ but with B-trees. Some helper functions are also provided. 
+//! 
+//! This repository provides (a) a command line application that reads files in Phylip format and (b) a small library you can easily integrate in your projects. It relies on rayon for parallelization. PR's are more than wellcome!
+//! A minimal example of the library is provided here. You can read more about the command line app by running speedytree -h
 //! ```
 //! use speedytree::DistanceMatrix;
 //! use speedytree::robinson_foulds;
@@ -9,12 +11,12 @@
 //! use rayon;
 //!// Raw Phylip format
 //!let input = "5
-//!    a	0	5	9	9	8
-//!    b	5	0	10	10	9
-//!    c	9	10	0	8	7
-//!    d	9	10	8	0	3
-//!    e	8	9	7	3	0
-//!".as_bytes();;
+//!    a    0    5    9    9    8
+//!    b    5    0    10    10    9
+//!    c    9    10    0    8    7
+//!    d    9    10    8    0    3
+//!    e    8    9    7    3    0
+//!".as_bytes();
 //!let d = DistanceMatrix::read_from_phylip(input).unwrap();
 //! // Canonical Neighbor Joining. Optimal for small problems.
 //! let tree1 = NeighborJoiningSolver::<Canonical>::default(d.clone())
@@ -41,48 +43,59 @@
 //! assert_eq!(robinson_foulds(&tree3, &tree4), 0);
 //! ```
 
-pub mod distances;
-pub mod hybrid_nj;
-pub mod naive_nj;
-pub mod newick;
+mod distances;
+mod hybrid_nj;
+mod naive_nj;
+mod newick;
 /// Property tests for neighbor joining algorithm
-pub mod property_tests;
-pub mod rapid_nj;
+mod property_tests;
+mod rapid_nj;
 pub use distances::DistanceMatrix;
+pub use newick::to_newick;
 pub use property_tests::tree_distances::{branch_score, robinson_foulds};
+
 use std::error;
 type ResultBox<T> = std::result::Result<T, Box<dyn error::Error>>;
+/// An undirected graph from Petgraph (internal nodes with empty names)
 pub type Tree = petgraph::graph::UnGraph<String, f64>;
 
+/// Generic solver
 pub struct NeighborJoiningSolver<U> {
     algo: U,
     dist: DistanceMatrix,
 }
+/// Canonical Neighbor-Joining, similar to QuickTree
 pub struct Canonical {}
 impl NeighborJoiningSolver<Canonical> {
+    /// Construct solver from parameters
     pub fn build(dist: DistanceMatrix) -> Self {
         NeighborJoiningSolver {
             algo: Canonical {},
-            dist: dist,
+            dist,
         }
     }
+    /// Default solver
     pub fn default(dist: DistanceMatrix) -> Self {
         Self::build(dist)
     }
+    /// Solve the Neighbor-Joining problem
     pub fn solve(self) -> ResultBox<Tree> {
         naive_nj::canonical_neighbor_joining(self.dist)
     }
 }
+/// In the spirit of RapidNJ, but with B-trees
 pub struct RapidBtrees {
     chunk_size: usize,
 }
 impl NeighborJoiningSolver<RapidBtrees> {
+    /// Construct solver from parameters
     pub fn build(dist: DistanceMatrix, chunk_size: usize) -> Self {
         NeighborJoiningSolver {
             algo: RapidBtrees { chunk_size },
-            dist: dist,
+            dist,
         }
     }
+    /// Default solver (based on available rayon threads)
     pub fn default(dist: DistanceMatrix) -> Self {
         let n = dist.size();
         let threads = rayon::current_num_threads();
@@ -92,34 +105,39 @@ impl NeighborJoiningSolver<RapidBtrees> {
         }
         NeighborJoiningSolver {
             algo: RapidBtrees { chunk_size },
-            dist: dist,
+            dist,
         }
     }
+    /// Set chunk size (for every worker)
     pub fn set_chunk_size(self, chunk_size: usize) -> Self {
         if chunk_size < 1 {
             panic!("Chunk size  must be > 0.");
         }
         Self::build(self.dist, chunk_size)
     }
+    /// Solve the Neighbor-Joining problem
     pub fn solve(self) -> ResultBox<Tree> {
         rapid_nj::rapid_nj(self.dist, self.algo.chunk_size)
     }
 }
 
+/// A mix of the Canonical and RapidNJ
 pub struct Hybrid {
     chunk_size: usize,
     canonical_iters: usize,
 }
 impl NeighborJoiningSolver<Hybrid> {
+    /// Construct solver from parameters
     pub fn build(dist: DistanceMatrix, chunk_size: usize, canonical_iters: usize) -> Self {
         NeighborJoiningSolver {
             algo: Hybrid {
                 chunk_size,
                 canonical_iters,
             },
-            dist: dist,
+            dist,
         }
     }
+    /// Default solver (based on available rayon threads and problem size)
     pub fn default(dist: DistanceMatrix) -> Self {
         let n = dist.size();
         let threads = rayon::current_num_threads();
@@ -130,22 +148,33 @@ impl NeighborJoiningSolver<Hybrid> {
                 chunk_size,
                 canonical_iters,
             },
-            dist: dist,
+            dist,
         }
     }
+    /// Solve the Neighbor-Joining problem
     pub fn solve(self) -> ResultBox<Tree> {
         hybrid_nj::neighbor_joining(self.dist, self.algo.canonical_iters, self.algo.chunk_size)
     }
+    /// Set chunk size (for every worker)
     pub fn set_chunk_size(self, chunk_size: usize) -> Self {
         if chunk_size < 1 {
             panic!("Chunk size  must be > 0.");
         }
         Self::build(self.dist, chunk_size, self.algo.canonical_iters)
     }
+    /// Set number of canonical iterations will be done
     pub fn set_canonical_steps(self, n: usize) -> Self {
         if n < 1 {
             panic!("n must be > 0.");
         }
         Self::build(self.dist, self.algo.chunk_size, n)
+    }
+    /// Set fraction of canonical iterations will be done
+    pub fn set_canonical_percentage(self, prop: f64) -> Self {
+        if prop <= 0.0 || prop >= 1.0 {
+            panic!("Proportion must be between 0 and 1.");
+        }
+        let n = self.dist.size() as f64 * prop / 100.0;
+        Self::build(self.dist, self.algo.chunk_size, n as usize)
     }
 }
