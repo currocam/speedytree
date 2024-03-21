@@ -2,7 +2,7 @@ use crate::{distances::DistanceMatrix, ResultBox, Tree};
 
 use super::{phylo_tree::PhyloTree, qmatrix::QMatrix};
 
-pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<Tree> {
+pub fn canonical_neighbor_joining(dist: DistanceMatrix) -> ResultBox<Tree> {
     let mut t = PhyloTree::build(&dist.names);
     let mut q = QMatrix::build(dist);
     while q.n_leaves() > 3 {
@@ -16,7 +16,7 @@ pub fn naive_neighbor_joining(dist: DistanceMatrix) -> ResultBox<Tree> {
     Ok(terminate_nj(t, q))
 }
 
-pub fn terminate_nj(tree: PhyloTree, q: QMatrix) -> Tree {
+pub(crate) fn terminate_nj(tree: PhyloTree, q: QMatrix) -> Tree {
     let (i, j, m) = (tree.nodes[&0], tree.nodes[&1], tree.nodes[&2]);
     let mut tree = tree.tree;
 
@@ -54,7 +54,7 @@ mod tests {
             ],
         };
 
-        let phylo = naive_neighbor_joining(d);
+        let phylo = canonical_neighbor_joining(d);
         assert!(phylo.is_ok());
 
         let tree = phylo.unwrap();

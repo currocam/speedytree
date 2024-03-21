@@ -5,19 +5,33 @@ use bit_vec::BitVec;
 use petgraph::stable_graph::EdgeIndex;
 
 use crate::Tree;
+
+fn count_leaves(x: &Tree) -> usize {
+    let mut leaf_count = 0;
+    for node in x.node_indices() {
+        if x.neighbors(node).count() == 1 {
+            leaf_count += 1;
+        }
+    }
+    leaf_count
+}
+
 /// Calculate the Branch-Score distance between two trees
-pub fn branch_score(a: Tree, b: Tree, n_leaves: usize) -> f64 {
+pub fn branch_score(a: &Tree, b: &Tree) -> f64 {
+    let n_leaves = (count_leaves(a), count_leaves(b));
+    assert_eq!(n_leaves.0, n_leaves.1);
+    let n_leaves = n_leaves.0;
     let mut bits_a = HashMap::new();
     let mut bits_b = HashMap::new();
     a.edge_indices()
         .zip(a.edge_weights())
         .for_each(|(edge, w)| {
-            bits_a.insert(collect_bit_vector(&a, edge, n_leaves), *w);
+            bits_a.insert(collect_bit_vector(a, edge, n_leaves), *w);
         });
     b.edge_indices()
         .zip(b.edge_weights())
         .for_each(|(edge, w)| {
-            bits_b.insert(collect_bit_vector(&b, edge, n_leaves), *w);
+            bits_b.insert(collect_bit_vector(b, edge, n_leaves), *w);
         });
 
     // Get union of a and b keys
@@ -37,14 +51,17 @@ pub fn branch_score(a: Tree, b: Tree, n_leaves: usize) -> f64 {
 }
 
 /// Calculate the Robinson-Foulds distance between two trees
-pub fn robinson_foulds(a: Tree, b: Tree, n_leaves: usize) -> usize {
+pub fn robinson_foulds(a: &Tree, b: &Tree) -> usize {
+    let n_leaves = (count_leaves(a), count_leaves(b));
+    assert_eq!(n_leaves.0, n_leaves.1);
+    let n_leaves = n_leaves.0;
     let bits_a: HashSet<BitVec> = HashSet::from_iter(
         a.edge_indices()
-            .map(|edge| collect_bit_vector(&a, edge, n_leaves)),
+            .map(|edge| collect_bit_vector(a, edge, n_leaves)),
     );
     let bits_b: HashSet<BitVec> = HashSet::from_iter(
         b.edge_indices()
-            .map(|edge| collect_bit_vector(&b, edge, n_leaves)),
+            .map(|edge| collect_bit_vector(b, edge, n_leaves)),
     );
 
     let mut distance = 0;
@@ -146,12 +163,12 @@ mod tests {
             t2.add_edge(d, u, 1.0);
             t2.add_edge(v, u, 1.0);
         }
-        assert_eq!(robinson_foulds(t1.clone(), t2.clone(), 4), 2);
-        assert_eq!(robinson_foulds(t1.clone(), t1.clone(), 4), 0);
-        assert_eq!(robinson_foulds(t2.clone(), t2.clone(), 4), 0);
+        assert_eq!(robinson_foulds(&t1, &t2), 2);
+        assert_eq!(robinson_foulds(&t1, &t1), 0);
+        assert_eq!(robinson_foulds(&t2, &t2), 0);
         //
-        assert_eq!(branch_score(t1.clone(), t2.clone(), 4), 112.0);
-        assert_eq!(branch_score(t1.clone(), t1, 4), 0.0);
-        assert_eq!(branch_score(t2.clone(), t2, 4), 0.0);
+        assert_eq!(branch_score(&t1, &t2), 112.0);
+        assert_eq!(branch_score(&t1, &t1), 0.0);
+        assert_eq!(branch_score(&t2, &t2), 0.0);
     }
 }
