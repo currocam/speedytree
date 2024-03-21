@@ -1,9 +1,9 @@
 #[cfg(test)]
 fn assert_equal_tree(a: &crate::Tree, b: &crate::Tree) {
     use crate::property_tests::tree_distances::{branch_score, robinson_foulds};
-    assert_eq!(robinson_foulds(a.clone(), b.clone()), 0);
-    assert!(petgraph::algo::is_isomorphic(&a.clone(), &b));
-    assert!(branch_score(a.clone(), b.clone()) < f64::EPSILON);
+    assert_eq!(robinson_foulds(&a, &b), 0);
+    assert!(petgraph::algo::is_isomorphic(&a, &b));
+    assert!(branch_score(&a, &b) < f64::EPSILON);
 }
 
 #[test]

@@ -24,7 +24,7 @@
 //! let tree2 = NeighborJoiningSolver::<RapidBtrees>::default(d.clone())
 //!   .solve()
 //!   .unwrap();
-//! assert_eq!(robinson_foulds(tree1, tree2), 0);
+//! assert_eq!(robinson_foulds(&tree1, &tree2), 0);
 //! 
 //! // You can improve the speed a lot by using multiple threads (see rayon::ThreadPoolBuilder::new())
 //! // If so, you may want to tune the chunk size every worker uses
@@ -38,7 +38,7 @@
 //!   .set_canonical_steps(2)
 //!   .solve()
 //!   .unwrap();
-//! assert_eq!(robinson_foulds(tree3, tree4), 0);
+//! assert_eq!(robinson_foulds(&tree3, &tree4), 0);
 //! ```
 
 pub mod hybrid_nj;

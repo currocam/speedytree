@@ -17,7 +17,7 @@ fn count_leaves(x: &Tree) -> usize {
 }
 
 /// Calculate the Branch-Score distance between two trees
-pub fn branch_score(a: Tree, b: Tree) -> f64 {
+pub fn branch_score(a: &Tree, b: &Tree) -> f64 {
     let n_leaves = (count_leaves(&a), count_leaves(&b)); 
     assert_eq!(n_leaves.0, n_leaves.1);
     let n_leaves = n_leaves.0;
@@ -52,7 +52,7 @@ pub fn branch_score(a: Tree, b: Tree) -> f64 {
 
 
 /// Calculate the Robinson-Foulds distance between two trees
-pub fn robinson_foulds(a: Tree, b: Tree) -> usize {
+pub fn robinson_foulds(a: &Tree, b: &Tree) -> usize {
     let n_leaves = (count_leaves(&a), count_leaves(&b)); 
     assert_eq!(n_leaves.0, n_leaves.1);
     let n_leaves = n_leaves.0;
@@ -164,12 +164,12 @@ mod tests {
             t2.add_edge(d, u, 1.0);
             t2.add_edge(v, u, 1.0);
         }
-        assert_eq!(robinson_foulds(t1.clone(), t2.clone()), 2);
-        assert_eq!(robinson_foulds(t1.clone(), t1.clone()), 0);
-        assert_eq!(robinson_foulds(t2.clone(), t2.clone()), 0);
+        assert_eq!(robinson_foulds(&t1, &t2), 2);
+        assert_eq!(robinson_foulds(&t1, &t1), 0);
+        assert_eq!(robinson_foulds(&t2, &t2), 0);
         //
-        assert_eq!(branch_score(t1.clone(), t2.clone()), 112.0);
-        assert_eq!(branch_score(t1.clone(), t1), 0.0);
-        assert_eq!(branch_score(t2.clone(), t2), 0.0);
+        assert_eq!(branch_score(&t1, &t2), 112.0);
+        assert_eq!(branch_score(&t1, &t1), 0.0);
+        assert_eq!(branch_score(&t2, &t2), 0.0);
     }
 }
