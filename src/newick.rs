@@ -14,7 +14,7 @@ fn format_edge_float<'a>(
     buffer.format_finite(*t.edge_weight(e).expect("Valid edge"))
 }
 
-/// Convert a tree (as generated from solver functions, as an undidrected Petgraph) to a string
+/// Convert a `Tree` to a string according to the [Newick](https://en.wikipedia.org/wiki/Newick_format) format
 pub fn to_newick(t: &Tree) -> String {
     let mut buffer = dtoa::Buffer::new();
     let root = root(t).expect("Node with three edges");

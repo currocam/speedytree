@@ -1,15 +1,15 @@
 use crate::ResultBox;
 use std::io::{self};
-/// Distance matrix struct
+/// Distance matrix data structure
 #[derive(Debug, Clone)]
 pub struct DistanceMatrix {
-    /// Distance matrix as a vector of vectors
+    /// Distance matrix
     pub matrix: Vec<Vec<f64>>,
-    /// Names of the sequences
+    /// Names of the taxa
     pub names: Vec<String>,
 }
 
-/// Distance matrix from a phylip file
+/// Distance matrix from a [PHYLIP](https://phylipweb.github.io/phylip/) file
 impl DistanceMatrix {
     pub fn read_from_phylip<R>(mut reader: R) -> ResultBox<DistanceMatrix>
     where

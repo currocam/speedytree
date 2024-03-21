@@ -2,7 +2,8 @@
 //!
 //! Provides Rust implementation of the Canonical algorithm and something in the spirit of RapidNJ but with B-trees. Some helper functions are also provided. 
 //! 
-//! This repository provides (a) a command line application that reads files in Phylip format and (b) a small library you can easily integrate in your projects. It relies on rayon for parallelization. PR's are more than wellcome!
+//! This repository provides (a) a command line application that reads files in Phylip format and (b) a small library you can easily integrate in your projects. It relies on rayon for parallelization.
+//! ## Example
 //! A minimal example of the library is provided here. You can read more about the command line app by running speedytree -h
 //! ```
 //! use speedytree::DistanceMatrix;
@@ -56,7 +57,7 @@ pub use property_tests::tree_distances::{branch_score, robinson_foulds};
 
 use std::error;
 type ResultBox<T> = std::result::Result<T, Box<dyn error::Error>>;
-/// An undirected graph from Petgraph (internal nodes with empty names)
+/// An undirected network built in top of [Petgraph](https://github.com/petgraph/petgraph). Internal nodes have empty names.
 pub type Tree = petgraph::graph::UnGraph<String, f64>;
 
 /// Generic solver
@@ -64,7 +65,7 @@ pub struct NeighborJoiningSolver<U> {
     algo: U,
     dist: DistanceMatrix,
 }
-/// Canonical Neighbor-Joining, similar to QuickTree
+/// Canonical Neighbor-Joining, similar to [QuickTree](https://github.com/khowe/quicktree). It runs on cubic time (worst and best case). It uses quadratic memory.  
 pub struct Canonical {}
 impl NeighborJoiningSolver<Canonical> {
     /// Construct solver from parameters
@@ -83,7 +84,7 @@ impl NeighborJoiningSolver<Canonical> {
         naive_nj::canonical_neighbor_joining(self.dist)
     }
 }
-/// In the spirit of RapidNJ, but with B-trees
+/// In the spirit of [RapidNJ](https://birc.au.dk/software/rapidnj/), but with B-trees. It runs on n^2 log(n) time best case and cubic time worst case.  It uses quadratic memory (with a higher constant).
 pub struct RapidBtrees {
     chunk_size: usize,
 }
@@ -121,7 +122,7 @@ impl NeighborJoiningSolver<RapidBtrees> {
     }
 }
 
-/// A mix of the Canonical and RapidNJ
+/// A mix of the Canonical and RapidBtrees. First, it starts with RapidBtrees (less lookups, but with an overhead), and then it changes the strategy. 
 pub struct Hybrid {
     chunk_size: usize,
     canonical_iters: usize,
