@@ -3,6 +3,10 @@ name = "speedytree"
 version = "0.1.0"
 authors = ["Curro Campuzano <campuzanocurro@gmail.com>"]
 edition = "2021"
+license-file = "LICENSE"
+description = "Canonical and RapidNJ implementations of Neighbor-joining in Rust"
+repository = "https://github.com/currocam/speedytree"
+readme = "README.md"
 
 [lib]
 name = "speedytree"
