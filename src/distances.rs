@@ -1,5 +1,3 @@
-use rand::seq::SliceRandom;
-
 use crate::ResultBox;
 use std::io::{self};
 /// Distance matrix struct
@@ -40,42 +38,11 @@ impl DistanceMatrix {
     pub fn size(&self) -> usize {
         self.matrix.len()
     }
-    /// Permutate the distance matrix for testing purposes
-    pub(crate) fn permutate(&mut self) {
-        let mut rng = rand::thread_rng();
-        let mut perm = (0..self.size()).collect::<Vec<usize>>();
-        perm.shuffle(&mut rng);
-        let mut new_matrix = vec![vec![0.0; self.size()]; self.size()];
-        for i in 0..self.size() {
-            for j in 0..self.size() {
-                new_matrix[i][j] = self.matrix[perm[i]][perm[j]];
-            }
+    pub fn build(matrix: Vec<Vec<f64>>, names: Vec<String>) -> ResultBox<DistanceMatrix>{
+        if matrix.len() != names.len() {
+            return Err("Matrix and names have different lengths".into());
         }
-        self.matrix = new_matrix;
-        let mut new_names = vec![String::new(); self.size()];
-        for i in 0..self.size() {
-            new_names[i] = self.names[perm[i]].clone();
-        }
-        self.names = new_names;
-    }
-    /// Example from Wikipedia, https://en.wikipedia.org/wiki/Neighbor_joining
-    pub(crate) fn wikipedia_example() -> DistanceMatrix {
-        DistanceMatrix {
-            matrix: vec![
-                vec![0.0, 5.0, 9.0, 9.0, 8.0],
-                vec![5.0, 0.0, 10.0, 10.0, 9.0],
-                vec![9.0, 10.0, 0.0, 8.0, 7.0],
-                vec![9.0, 10.0, 8.0, 0.0, 3.0],
-                vec![8.0, 9.0, 7.0, 3.0, 0.0],
-            ],
-            names: vec![
-                "A".to_string(),
-                "B".to_string(),
-                "C".to_string(),
-                "D".to_string(),
-                "E".to_string(),
-            ],
-        }
+        Ok(DistanceMatrix { matrix, names })
     }
 }
 

@@ -5,6 +5,7 @@ fn assert_equal_tree(a: &crate::Tree, b: &crate::Tree, i: usize) {
     assert!(petgraph::algo::is_isomorphic(&a.clone(), &b));
     assert!(branch_score(a.clone(), b.clone(), i) < f64::EPSILON);
 }
+
 #[test]
 fn test_random_additive_binary_trees_naive() {
     use crate::{
@@ -41,10 +42,6 @@ fn test_random_additive_binary_trees_mix() {
     use crate::property_tests::random_additive_tree::{
         distance_matrix_from_tree, random_unrooted_binary_tree,
     };
-
-    let original_tree = random_unrooted_binary_tree(20);
-    let mut d: crate::distances::DistanceMatrix = distance_matrix_from_tree(original_tree.clone());
-    d.permutate();
     for i in (25..100).step_by(25) {
         let original_tree = random_unrooted_binary_tree(i);
         let d: crate::distances::DistanceMatrix = distance_matrix_from_tree(original_tree.clone());
