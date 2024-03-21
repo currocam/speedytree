@@ -1,8 +1,12 @@
 //! Canonical and RapidNJ implementations of Neighbor-joining in Rust
 //!
-//! Provides Rust implementation of the Canonical algorithm and something in the spirit of RapidNJ but with B-trees. Some helper functions are also provided. 
+//! Speedytree is a Rust implementation of Neighbor-Joining for building phylogenetic trees from large Phylip distance matrices. 
 //! 
-//! This repository provides (a) a command line application that reads files in Phylip format and (b) a small library you can easily integrate in your projects. It relies on rayon for parallelization.
+//! There are two strategies: the Canonical algorithm (as [QuickTree](https://github.com/khowe/quicktree)) and something in the spirit of [RapidNJ](https://birc.au.dk/software/rapidnj/) but with B-trees.
+//! You can read more about Neighbor-Joining [here](https://en.wikipedia.org/wiki/Neighbor_joining). The RapidNJ algorithm should be faster for very big problems at the cost of a larger memory overhead. 
+//! 
+//! A command line application (that reads PHYLIP distance matrix) is also provided. Please, read more in the [GitHub repository](https://github.com/currocam/speedytree). You will also find a few slides I made there.
+//! 
 //! ## Example
 //! A minimal example of the library is provided here. You can read more about the command line app by running speedytree -h
 //! ```

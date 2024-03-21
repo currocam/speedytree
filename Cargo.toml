@@ -8,6 +8,8 @@ description = "Canonical and RapidNJ implementations of Neighbor-joining in Rust
 repository = "https://github.com/currocam/speedytree"
 readme = "README.md"
 
+exclude = ["speedytree_slides.pdf", "benchmarks/", "Makefile", "Snakefile"]
+
 [lib]
 name = "speedytree"
 path = "src/lib.rs"
@@ -15,12 +17,6 @@ path = "src/lib.rs"
 [[bin]]
 name = "speedytree"
 path = "src/bin.rs"
-
-exclude = [
-    "Makefile",
-    "Snakefile",
-    "benchmarks/*"
-]
 
 [dependencies]
 bit-set = "0.5.3"

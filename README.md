@@ -6,6 +6,8 @@ Speedytree is a Rust implementation of Neighbor-Joining for building phylogeneti
 
 You can read more about Neighbor-Joining [here](https://en.wikipedia.org/wiki/Neighbor_joining). The RapidNJ algorithm should be faster for very big problems at the cost of a larger memory overhead. 
 
+You may also find interesting the [slides](speedytree_slides.pdf) I made about this project.
+
 ### Benchmark
 
 
@@ -26,10 +28,6 @@ Speedytree has a test suite that can be run with `cargo test`. There are three t
 
 
 ### About the command line application
-
-
-I wrote it as part of my MSc. in Bioinformatics at the University of Aarhus.
-
 
 #### Installation
 You can either download the binary from the releases page or build it yourself. To build it yourself you need to have Rust installed. Then you can run `cargo build --release` to build the binary. The binary will be located in `target/release/speedytree`.
