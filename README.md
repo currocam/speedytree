@@ -3,7 +3,7 @@
 Speedytree is a program for building phylogenetic trees from large Phylip distance matrices. I wrote it as part of my MSc. in Bioinformatics at the University of Aarhus. It implements the canonical algorithm, as well as the RapidNJ heuristic. 
 
 ### Installation
-You can either download the binary from the releases page or build it yourself. To build it yourself you need to have nightly Rust installed. Then you can run `cargo build --release` to build the binary. The binary will be located in `target/release/speedytree`.
+You can either download the binary from the releases page or build it yourself. To build it yourself you need to have Rust installed. Then you can run `cargo build --release` to build the binary. The binary will be located in `target/release/speedytree`.
 
 ### Usage
 Speedytree takes a Phylip distance matrix as input and outputs a Newick tree. It can be used like this:
